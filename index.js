@@ -41,22 +41,13 @@ const pageScraper = {
     let page = await browser.newPage();
     console.log(`Navigating to ` + url + `...`);
     await page.goto(url);
-    
+
     await page.waitForSelector('.hvr-bob');
     //finds all links
-    const hrefs = await page.$$eval(
-      'a', 
-      as => as.map(a => a.href)
+    const hrefs = await page.$$eval('a', as => as.map(a => a.href)
       .filter(href => href.includes('https://download.msi.com/dvr_exe/'))
-      );
+    );
     console.log(hrefs);
-    
-    /*
-    const selector = '.hvr-bob > a'
-    await page.waitForSelector(selector)
-    const links = await page.$$eval(selector, am => am.filter(e => e.href).map(e => e.href))
-    console.log(links)
-    */
   }
 }
 
