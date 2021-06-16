@@ -77,4 +77,4 @@ function main() {
   scrapeAll(browserInstance, url)
 }
 
-
+//child exec wmic baseboard get product,Manufacturer for mb
