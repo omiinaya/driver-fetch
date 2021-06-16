@@ -37,11 +37,11 @@ async function startBrowser() {
 }
 
 const pageScraper = {
-  url: 'http://books.toscrape.com',
-  async scraper(browser) {
+  async scraper(browser, url) {
     let page = await browser.newPage();
-    console.log(`Navigating to ${this.url}...`);
-    await page.goto(this.url);
+    console.log(`Navigating to `+url+`...`);
+    await page.goto(url);
+    /*
     await page.waitForSelector('.page_inner');
     // Get the link to all the required books
     let urls = await page.$$eval('section ol > li', links => {
@@ -52,15 +52,15 @@ const pageScraper = {
       return links;
     });
     console.log(urls);
-
+    */
   }
 }
 
-async function scrapeAll(browserInstance) {
+async function scrapeAll(browserInstance, url) {
   let browser;
   try {
     browser = await browserInstance;
-    await pageScraper.scraper(browser);
+    await pageScraper.scraper(browser, url);
 
   }
   catch (err) {
@@ -71,9 +71,10 @@ async function scrapeAll(browserInstance) {
 function main() {
   //Start the browser and create a browser instance
   let browserInstance = startBrowser();
+  let url = 'https://www.msi.com/Motherboard/support/MPG-Z590-GAMING-CARBON-WIFI#down-driver&Win10%2064'
 
   // Pass the browser instance to the scraper controller
-  scrapeAll(browserInstance)
+  scrapeAll(browserInstance, url)
 }
 
 
