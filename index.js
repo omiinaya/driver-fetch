@@ -1,5 +1,6 @@
 require('electron-reload')(__dirname, { ignored: /db|[\/\\]\./, argv: [] });
 const { app, BrowserWindow } = require('electron');
+const { exec, execSync } = require('child_process')
 const ipc = require('electron').ipcMain
 const puppeteer = require('puppeteer');
 const path = require('path');
@@ -19,6 +20,7 @@ app.on('ready', createWindow);
 
 ipc.on('TESTING_1', function () {
   main()
+  console.log(getSystemInfo())
 })
 
 async function startBrowser() {
@@ -64,12 +66,15 @@ async function scrapeAll(browserInstance, url) {
 }
 
 function main() {
-  //Start the browser and create a browser instance
+  //start the browser and create a browser instance
   let browserInstance = startBrowser();
   let url = 'https://www.msi.com/Motherboard/support/MPG-Z590-GAMING-CARBON-WIFI#down-driver&Win10%2064'
 
-  // Pass the browser instance to the scraper controller
+  //pass browser instance and url to the scraper
   scrapeAll(browserInstance, url)
 }
 
-//child exec wmic baseboard get product,Manufacturer for mb
+function getSystemInfo() {
+  var motherboard = execSync('wmic baseboard get product').toString().replace(/\n/g, '').split(' ')[2];
+  return motherboard
+}
