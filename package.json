@@ -7,7 +7,6 @@
     "server": "node server.js",
     "client": "electron .",
     "start": "electron .",
-    "dev": "concurrently \"npm run server\" \"npm run client\"",
     "rebuild": "electron-rebuild -f -w main.js"
   },
   "repository": "https://github.com/omiinaya/MC-Mod-Patcher",
@@ -20,11 +19,7 @@
     "electron-rebuild": "^2.3.5"
   },
   "dependencies": {
-    "axios": "^0.21.1",
-    "concurrently": "^6.2.0",
-    "electron-dl": "^3.2.1",
     "electron-reload": "^1.5.0",
-    "html-get": "^2.8.23",
     "puppeteer": "^10.0.0",
     "update-electron-app": "^2.0.1",
     "v8-compile-cache": "^2.3.0"
