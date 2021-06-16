@@ -39,19 +39,23 @@ async function startBrowser() {
 const pageScraper = {
   async scraper(browser, url) {
     let page = await browser.newPage();
-    console.log(`Navigating to `+url+`...`);
+    console.log(`Navigating to ` + url + `...`);
     await page.goto(url);
+    
+    await page.waitForSelector('.hvr-bob');
+    //finds all links
+    const hrefs = await page.$$eval(
+      'a', 
+      as => as.map(a => a.href)
+      .filter(href => href.includes('https://download.msi.com/dvr_exe/'))
+      );
+    console.log(hrefs);
+    
     /*
-    await page.waitForSelector('.page_inner');
-    // Get the link to all the required books
-    let urls = await page.$$eval('section ol > li', links => {
-      // Make sure the book to be scraped is in stock
-      links = links.filter(link => link.querySelector('.instock.availability > i').textContent !== "In stock")
-      // Extract the links from the data
-      links = links.map(el => el.querySelector('h3 > a').href)
-      return links;
-    });
-    console.log(urls);
+    const selector = '.hvr-bob > a'
+    await page.waitForSelector(selector)
+    const links = await page.$$eval(selector, am => am.filter(e => e.href).map(e => e.href))
+    console.log(links)
     */
   }
 }
