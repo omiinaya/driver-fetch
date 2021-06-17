@@ -7,8 +7,8 @@ const path = require('path');
 
 const createWindow = () => {
   const mainWindow = new BrowserWindow({
-    width: 800,
-    height: 600,
+    width: 400,
+    height: 200,
     webPreferences: {
       nodeIntegration: true
     }
@@ -42,6 +42,7 @@ ipc.on('TESTING_1', function () {
   console.log(getMBInfo())
   console.log(getPCName())
   console.log(parseMBInfo())
+  console.log(getCPUInfo())
 })
 
 async function startBrowser() {
@@ -73,7 +74,7 @@ async function scrapeAll(browserInstance, url) {
 function main() {
   //start the browser and create a browser instance
   let browserInstance = startBrowser();
-  let url = getURL()
+  let url = getMSIURL()
 
   //pass browser instance and url to the scraper
   scrapeAll(browserInstance, url)
@@ -95,12 +96,19 @@ function parseMBInfo() {
 }
 
 function getPCName() {
-  var name = execSync('echo %computername%').toString()
+  var name = execSync('echo %computername%').toString().trim()
   return name
 }
 
-function getURL() {
+function getMSIURL() {
   var motherboard = parseMBInfo()
   var msi = 'https://www.msi.com/Motherboard/support/'+motherboard+'#down-driver&Win10%2064'
   return msi
+}
+
+function getCPUInfo() {
+  var x = execSync('wmic cpu get name').toString().replace("Name", "").trim()
+  var y = x.lastIndexOf(' ')
+  var z = x.substring(0, y + 1)
+  return z
 }
