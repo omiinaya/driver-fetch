@@ -1,6 +1,6 @@
 require('electron-reload')(__dirname, { ignored: /db|[\/\\]\./, argv: [] });
 const { app, BrowserWindow } = require('electron');
-const { exec, execSync } = require('child_process')
+const { execSync } = require('child_process')
 const ipc = require('electron').ipcMain
 const puppeteer = require('puppeteer');
 const path = require('path');
@@ -16,11 +16,32 @@ const createWindow = () => {
   mainWindow.loadFile(path.join(__dirname, './assets/html/index.html'));
 };
 
+const pageScraper = {
+  async scraper(browser, url) {
+    let page = await browser.newPage();
+    console.log(`Navigating to ` + url + `...`);
+    await page.goto(url);
+
+    //MSI
+    await page.waitForSelector('.hvr-bob');
+    const hrefs = await page.$$eval('a', as => as.map(a => a.href)
+      .filter(href => href.includes('https://download.msi.com/dvr_exe/'))
+    );
+    console.log(hrefs);
+    
+    //ASROCK
+    //GIGABYTE
+    //ASUS
+  }
+}
+
 app.on('ready', createWindow);
 
 ipc.on('TESTING_1', function () {
   main()
-  console.log(getSystemInfo())
+  console.log(getMBInfo())
+  console.log(getPCName())
+  console.log(parseMBInfo())
 })
 
 async function startBrowser() {
@@ -38,27 +59,11 @@ async function startBrowser() {
   return browser;
 }
 
-const pageScraper = {
-  async scraper(browser, url) {
-    let page = await browser.newPage();
-    console.log(`Navigating to ` + url + `...`);
-    await page.goto(url);
-
-    await page.waitForSelector('.hvr-bob');
-    //finds all links
-    const hrefs = await page.$$eval('a', as => as.map(a => a.href)
-      .filter(href => href.includes('https://download.msi.com/dvr_exe/'))
-    );
-    console.log(hrefs);
-  }
-}
-
 async function scrapeAll(browserInstance, url) {
   let browser;
   try {
     browser = await browserInstance;
     await pageScraper.scraper(browser, url);
-
   }
   catch (err) {
     console.log("Could not resolve the browser instance => ", err);
@@ -68,13 +73,34 @@ async function scrapeAll(browserInstance, url) {
 function main() {
   //start the browser and create a browser instance
   let browserInstance = startBrowser();
-  let url = 'https://www.msi.com/Motherboard/support/MPG-Z590-GAMING-CARBON-WIFI#down-driver&Win10%2064'
+  let url = getURL()
 
   //pass browser instance and url to the scraper
   scrapeAll(browserInstance, url)
 }
 
-function getSystemInfo() {
-  var motherboard = execSync('wmic baseboard get product').toString().replace(/\n/g, '').split(' ')[2];
-  return motherboard
+function getMBInfo() {
+  var x = execSync('wmic baseboard get product').toString().replace("Product", "").trim()
+  var y = x.lastIndexOf(' ')
+  var z = x.substring(0, y + 1)
+  return z
+}
+
+function parseMBInfo() {
+  var mb = getMBInfo()
+  var parts = mb.split(" ")
+  parts.splice(parts.indexOf(' '))
+  var parsed = parts.join('-')
+  return parsed
+}
+
+function getPCName() {
+  var name = execSync('echo %computername%').toString()
+  return name
+}
+
+function getURL() {
+  var motherboard = parseMBInfo()
+  var msi = 'https://www.msi.com/Motherboard/support/'+motherboard+'#down-driver&Win10%2064'
+  return msi
 }
