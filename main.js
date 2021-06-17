@@ -44,6 +44,7 @@ ipc.on('TESTING_1', function () {
   console.log(getPCName())
   console.log(getCPUInfo())
   console.log(getManufacturer())
+  console.log(getASROCKURL())
 })
 
 async function startBrowser() {
@@ -93,7 +94,7 @@ function craftURL() {
     //url = getAORUSURL()
   }
   else if (getManufacturer() === 'ASROCK') {
-    //url = getASROCKURL()
+    url = getASROCKURL()
   }
   return url
 }
@@ -124,13 +125,20 @@ function getMSIURL() {
   return msi
 }
 
-/*
-function getASUSURL() {
-  var motherboard = parseASUSInfo()
-  var asus = 'https://www.msi.com/Motherboard/support/'+motherboard+'#down-driver&Win10%2064'
-  return asus
+function parseASROCKInfo() {
+  var mb = getMBInfo()
+  var parts = mb.split(" ")
+  parts.splice(parts.indexOf(''))
+  var parsed = parts.join('%')
+  return parsed
 }
-*/
+
+function getASROCKURL() {
+  var motherboard = parseASROCKInfo()
+  var asrock = 'https://www.asrock.com/mb/'+getCPUInfo()+'/'+motherboard+'/index.us.asp'
+  return asrock
+}
+
 
 function getCPUInfo() {
   var cpu
