@@ -143,4 +143,7 @@ function setManufacturer() {
   if (getManufacturer().includes('Micro-Star')) {
     return 'MSI'
   }
+  else if (getManufacturer().includes('ASUSTeK')) {
+    return 'ASUS'
+  }
 }
