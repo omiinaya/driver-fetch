@@ -5,6 +5,9 @@ const ipc = require('electron').ipcMain
 const puppeteer = require('puppeteer');
 const path = require('path');
 
+//globals
+let manufacturer;
+
 const createWindow = () => {
   const mainWindow = new BrowserWindow({
     width: 400,
@@ -43,6 +46,8 @@ ipc.on('TESTING_1', function () {
   console.log(getPCName())
   console.log(parseMBInfo())
   console.log(getCPUInfo())
+  console.log(getManufacturer())
+  console.log(setManufacturer())
 })
 
 async function startBrowser() {
@@ -74,10 +79,27 @@ async function scrapeAll(browserInstance, url) {
 function main() {
   //start the browser and create a browser instance
   let browserInstance = startBrowser();
-  let url = getMSIURL()
+  let url = craftURL()
 
   //pass browser instance and url to the scraper
   scrapeAll(browserInstance, url)
+}
+
+function craftURL() {
+  var url;
+  if (setManufacturer() === 'MSI') {
+    url = getMSIURL()
+  } 
+  else if (getManufacturer() === 'ASUS') {
+    //url = getASUSURL()
+  }
+  else if (getManufacturer() === 'AORUS') {
+    //url = getAORUSURL()
+  }
+  else if (getManufacturer() === 'ASROCK') {
+    //url = getAORUSURL()
+  }
+  return url
 }
 
 function getMBInfo() {
@@ -111,4 +133,14 @@ function getCPUInfo() {
   var y = x.lastIndexOf(' ')
   var z = x.substring(0, y + 1)
   return z
+}
+
+function getManufacturer() {
+  return execSync('wmic baseboard get manufacturer').toString().replace("Manufacturer", "").trim()
+}
+
+function setManufacturer() {
+  if (getManufacturer().includes('Micro-Star')) {
+    return 'MSI'
+  }
 }
