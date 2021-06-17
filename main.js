@@ -40,11 +40,15 @@ app.on('ready', createWindow);
 ipc.on('TESTING_1', function () {
   main()
   console.log(getMBInfo())
-  console.log(parseMSIInfo())
+  console.log(parseDash())
+  console.log(parsePercent())
   console.log(getPCName())
   console.log(getCPUInfo())
   console.log(getManufacturer())
+  console.log(getMSIURL())
   console.log(getASROCKURL())
+  console.log(getAORUSURL())
+  console.log(getASUSURL())
 })
 
 async function startBrowser() {
@@ -88,10 +92,10 @@ function craftURL() {
     url = getMSIURL()
   }
   else if (getManufacturer() === 'ASUS') {
-    //url = getASUSURL()
+    url = getASUSURL()
   }
   else if (getManufacturer() === 'AORUS') {
-    //url = getAORUSURL()
+    url = getAORUSURL()
   }
   else if (getManufacturer() === 'ASROCK') {
     url = getASROCKURL()
@@ -106,39 +110,35 @@ function getMBInfo() {
   return z
 }
 
-function parseMSIInfo() {
-  var mb = getMBInfo()
-  var parts = mb.split(" ")
-  parts.splice(parts.indexOf(' '))
-  var parsed = parts.join('-')
-  return parsed
-}
-
 function getPCName() {
   var name = execSync('echo %computername%').toString().trim()
   return name
 }
 
 function getMSIURL() {
-  var motherboard = parseMSIInfo()
+  var motherboard = parseDash()
   var msi = 'https://www.msi.com/Motherboard/support/' + motherboard + '#down-driver&Win10%2064'
   return msi
 }
 
-function parseASROCKInfo() {
-  var mb = getMBInfo()
-  var parts = mb.split(" ")
-  parts.splice(parts.indexOf(''))
-  var parsed = parts.join('%')
-  return parsed
-}
-
 function getASROCKURL() {
-  var motherboard = parseASROCKInfo()
-  var asrock = 'https://www.asrock.com/mb/'+getCPUInfo()+'/'+motherboard+'/index.us.asp'
+  var motherboard = parsePercent()
+  var cpu = getCPUInfo()
+  var asrock = 'https://www.asrock.com/mb/' + cpu + '/' + motherboard + '/index.us.asp#Download'
   return asrock
 }
 
+function getAORUSURL() {
+  var motherboard = parseDash()
+  var asrock = 'https://www.gigabyte.com/Motherboard/' + motherboard + '/support#support-dl-driver'
+  return asrock
+}
+
+function getASUSURL() {
+  var motherboard = parseDash()
+  var asrock = 'https://www.asus.com/us/Motherboards-Components/Motherboards/All-series/' + motherboard + '/HelpDesk_Download/'
+  return asrock
+}
 
 function getCPUInfo() {
   var cpu
@@ -163,11 +163,27 @@ function getManufacturer() {
     return 'ASUS'
   }
   /*
-  else if (parsed.includes('ASUSTeK')) {
+  else if (parsed.includes('AORUS')) {
     return 'AORUS'
   }
-  else if (parsed.includes('ASUSTeK')) {
+  else if (parsed.includes('ASROCK')) {
     return 'ASROCK'
   }
   */
+}
+
+function parsePercent() {
+  var mb = getMBInfo()
+  var parts = mb.split(" ")
+  parts.splice(parts.indexOf(''))
+  var parsed = parts.join('%')
+  return parsed
+}
+
+function parseDash() {
+  var mb = getMBInfo()
+  var parts = mb.split(" ")
+  parts.splice(parts.indexOf(''))
+  var parsed = parts.join('-')
+  return parsed
 }
