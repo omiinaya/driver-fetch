@@ -31,7 +31,7 @@ const pageScraper = {
       .filter(href => href.includes('https://download.msi.com/dvr_exe/'))
     );
     console.log(hrefs);
-    
+
     //ASROCK
     //GIGABYTE
     //ASUS
@@ -43,10 +43,9 @@ app.on('ready', createWindow);
 ipc.on('TESTING_1', function () {
   main()
   console.log(getMBInfo())
+  console.log(parseMSIInfo())
   console.log(getPCName())
-  console.log(parseMBInfo())
   console.log(getCPUInfo())
-  console.log(getManufacturer())
   console.log(setManufacturer())
 })
 
@@ -89,7 +88,7 @@ function craftURL() {
   var url;
   if (setManufacturer() === 'MSI') {
     url = getMSIURL()
-  } 
+  }
   else if (getManufacturer() === 'ASUS') {
     //url = getASUSURL()
   }
@@ -109,7 +108,7 @@ function getMBInfo() {
   return z
 }
 
-function parseMBInfo() {
+function parseMSIInfo() {
   var mb = getMBInfo()
   var parts = mb.split(" ")
   parts.splice(parts.indexOf(' '))
@@ -123,16 +122,30 @@ function getPCName() {
 }
 
 function getMSIURL() {
-  var motherboard = parseMBInfo()
-  var msi = 'https://www.msi.com/Motherboard/support/'+motherboard+'#down-driver&Win10%2064'
+  var motherboard = parseMSIInfo()
+  var msi = 'https://www.msi.com/Motherboard/support/' + motherboard + '#down-driver&Win10%2064'
   return msi
 }
 
+/*
+function getASUSURL() {
+  var motherboard = parseASUSInfo()
+  var asus = 'https://www.msi.com/Motherboard/support/'+motherboard+'#down-driver&Win10%2064'
+  return asus
+}
+*/
+
 function getCPUInfo() {
+  var cpu
   var x = execSync('wmic cpu get name').toString().replace("Name", "").trim()
-  var y = x.lastIndexOf(' ')
-  var z = x.substring(0, y + 1)
-  return z
+  var y = x.split(' ')
+  z = y[0]
+  if (z.includes('Intel')) {
+    cpu = 'Intel'
+  } else {
+    cpu = 'AMD'
+  }
+  return cpu
 }
 
 function getManufacturer() {
@@ -146,4 +159,12 @@ function setManufacturer() {
   else if (getManufacturer().includes('ASUSTeK')) {
     return 'ASUS'
   }
+  /*
+  else if (getManufacturer().includes('x')) {
+    return 'ASROCK'
+  }
+  else if (getManufacturer().includes('x')) {
+    return 'AORUS'
+  }
+  */
 }
