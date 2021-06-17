@@ -5,9 +5,6 @@ const ipc = require('electron').ipcMain
 const puppeteer = require('puppeteer');
 const path = require('path');
 
-//globals
-let manufacturer;
-
 const createWindow = () => {
   const mainWindow = new BrowserWindow({
     width: 400,
@@ -46,7 +43,7 @@ ipc.on('TESTING_1', function () {
   console.log(parseMSIInfo())
   console.log(getPCName())
   console.log(getCPUInfo())
-  console.log(setManufacturer())
+  console.log(getManufacturer())
 })
 
 async function startBrowser() {
@@ -86,7 +83,7 @@ function main() {
 
 function craftURL() {
   var url;
-  if (setManufacturer() === 'MSI') {
+  if (getManufacturer() === 'MSI') {
     url = getMSIURL()
   }
   else if (getManufacturer() === 'ASUS') {
@@ -96,7 +93,7 @@ function craftURL() {
     //url = getAORUSURL()
   }
   else if (getManufacturer() === 'ASROCK') {
-    //url = getAORUSURL()
+    //url = getASROCKURL()
   }
   return url
 }
@@ -149,22 +146,20 @@ function getCPUInfo() {
 }
 
 function getManufacturer() {
-  return execSync('wmic baseboard get manufacturer').toString().replace("Manufacturer", "").trim()
-}
-
-function setManufacturer() {
-  if (getManufacturer().includes('Micro-Star')) {
+  var output = execSync('wmic baseboard get manufacturer').toString()
+  var parsed = output.replace("Manufacturer", "").trim()
+  if (parsed.includes('Micro-Star')) {
     return 'MSI'
   }
-  else if (getManufacturer().includes('ASUSTeK')) {
+  else if (parsed.includes('ASUSTeK')) {
     return 'ASUS'
   }
   /*
-  else if (getManufacturer().includes('x')) {
-    return 'ASROCK'
-  }
-  else if (getManufacturer().includes('x')) {
+  else if (parsed.includes('ASUSTeK')) {
     return 'AORUS'
+  }
+  else if (parsed.includes('ASUSTeK')) {
+    return 'ASROCK'
   }
   */
 }
