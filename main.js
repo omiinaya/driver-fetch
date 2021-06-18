@@ -75,14 +75,16 @@ async function scrapeAll(browserInstance, url) {
 function main() {
   //start the browser and create a browser instance
   let browserInstance = startBrowser();
-  let a = 'MPG-Z590-GAMING-CARBON-WIFI' //testing variable.
-  let url = craftURL(a)
-  
+  let a = 'PRIME-Z590-P-WIFI' //testing mb name
+  let b = 'ASUS'              //testing mb brand
+  let c = 'Intel'             //testing cpu brand
+  let url = craftURL(a, b, c)
+
   console.log(getMBInfo(a))
   console.log(parseDash(a))
   console.log(parsePercent(a))
-  console.log(getCPUInfo())
-  console.log(getManufacturer())
+  console.log(getCPUInfo(c))
+  console.log(getManufacturer(b))
   console.log(getMSIURL(a))
   console.log(getASROCKURL(a))
   console.log(getAORUSURL(a))
@@ -92,18 +94,18 @@ function main() {
   scrapeAll(browserInstance, url)
 }
 
-function craftURL(a) {
+function craftURL(a, b, c) {
   var url;
-  if (getManufacturer() === 'MSI') {
+  if (getManufacturer(b) === 'MSI') {
     url = getMSIURL(a)
   }
-  else if (getManufacturer() === 'ASUS') {
+  else if (getManufacturer(b) === 'ASUS') {
     url = getASUSURL(a)
   }
-  else if (getManufacturer() === 'AORUS') {
-    url = getAORUSURL(a)
+  else if (getManufacturer(b) === 'AORUS') {
+    url = getAORUSURL(a, c)
   }
-  else if (getManufacturer() === 'ASROCK') {
+  else if (getManufacturer(b) === 'ASROCK') {
     url = getASROCKURL(a)
   }
   return url
@@ -123,7 +125,7 @@ function getMBInfo() {
 
 function parsePercent(a) {
   var mb = getMBInfo()
-  if (a === "") {
+  if (!a) {
     if (mb.lastIndexOf(' ') != -1) {
       var parsed;
       var parts = mb.split(" ")
@@ -140,7 +142,7 @@ function parsePercent(a) {
 
 function parseDash(a) {
   var mb = getMBInfo()
-  if (a === "") {
+  if (!a) {
     if (mb.lastIndexOf(' ') != -1) {
       var parsed;
       var parts = mb.split(" ")
@@ -159,8 +161,8 @@ function getMSIURL(a) {
   return 'https://www.msi.com/Motherboard/support/' + parseDash(a) + '#down-driver&Win10%2064'
 }
 
-function getASROCKURL(a) {
-  return 'https://www.asrock.com/mb/' + getCPUInfo() + '/' + parsePercent(a) + '/index.us.asp#Download'
+function getASROCKURL(a, c) {
+  return 'https://www.asrock.com/mb/' + getCPUInfo(c) + '/' + parsePercent(a) + '/index.us.asp#Download'
 }
 
 function getAORUSURL(a) {
@@ -171,34 +173,46 @@ function getASUSURL(a) {
   return 'https://www.asus.com/us/Motherboards-Components/Motherboards/All-series/' + parseDash(a) + '/HelpDesk_Download/'
 }
 
-function getCPUInfo() {
-  var cpu
-  var x = execSync('wmic cpu get name').toString().replace("Name", "").trim()
-  var y = x.split(' ')
-  z = y[0]
-  if (z.includes('Intel')) {
-    cpu = 'Intel'
+function getCPUInfo(c) {
+  if (!c) {
+    var cpu
+    var x = execSync('wmic cpu get name').toString().replace("Name", "").trim()
+    var y = x.split(' ')
+    z = y[0]
+    if (z.includes('Intel')) {
+      cpu = 'Intel'
+    } else {
+      cpu = 'AMD'
+    }
+    return cpu
   } else {
-    cpu = 'AMD'
+    return c
   }
-  return cpu
 }
 
-function getManufacturer() {
-  var output = execSync('wmic baseboard get manufacturer').toString()
-  var parsed = output.replace("Manufacturer", "").trim()
-  if (parsed.includes('Micro-Star')) {
-    return 'MSI'
+function getManufacturer(b) {
+  if (!b) {
+    var output = execSync('wmic baseboard get manufacturer').toString()
+    var parsed = output.replace("Manufacturer", "").trim()
+    if (parsed.includes('Micro-Star')) {
+      return 'MSI'
+    }
+    else if (parsed.includes('ASUSTeK')) {
+      return 'ASUS'
+    }
+    /*
+    else if (parsed.includes('AORUS')) {
+      return 'AORUS'
+    }
+    else if (parsed.includes('ASROCK')) {
+      return 'ASROCK'
+    }
+    */
+  } else {
+    return b
   }
-  else if (parsed.includes('ASUSTeK')) {
-    return 'ASUS'
-  }
-  /*
-  else if (parsed.includes('AORUS')) {
-    return 'AORUS'
-  }
-  else if (parsed.includes('ASROCK')) {
-    return 'ASROCK'
-  }
-  */
 }
+
+//tested: 
+//MPG-Z590-GAMING-CARBON-WIFI
+//MEG-Z590-UNIFY
