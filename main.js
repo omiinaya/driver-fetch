@@ -21,34 +21,29 @@ const pageScraper = {
     let page = await browser.newPage();
     console.log(`Navigating to ` + url + `...`);
     await page.goto(url);
-
     //MSI
-    await page.waitForSelector('.hvr-bob');
-    const hrefs = await page.$$eval('a', as => as.map(a => a.href)
-      .filter(href => href.includes('https://download.msi.com/dvr_exe/'))
-    );
-    console.log(hrefs);
-
+    scrapeMSI(page)
     //ASROCK
+    //scrapeASROCK(page)
     //GIGABYTE
+    //scrapeGIGABYTE(page)
     //ASUS
+    //scrapeASUS(page)
   }
+}
+
+async function scrapeMSI(page) {
+  await page.waitForSelector('.hvr-bob');
+  const hrefs = await page.$$eval('a', as => as.map(a => a.href)
+    .filter(href => href.includes('https://download.msi.com/dvr_exe/'))
+  );
+  console.log(hrefs);
 }
 
 app.on('ready', createWindow);
 
 ipc.on('TESTING_1', function () {
   main()
-  console.log(getMBInfo())
-  console.log(parseDash())
-  console.log(parsePercent())
-  console.log(getPCName())
-  console.log(getCPUInfo())
-  console.log(getManufacturer())
-  console.log(getMSIURL())
-  console.log(getASROCKURL())
-  console.log(getAORUSURL())
-  console.log(getASUSURL())
 })
 
 async function startBrowser() {
@@ -77,54 +72,39 @@ async function scrapeAll(browserInstance, url) {
   }
 }
 
-function parsePercent() {
-  var mb = getMBInfo()
-  if (mb.lastIndexOf(' ') != -1) {
-    var parsed;
-    var parts = mb.split(" ")
-    parts.splice(parts.indexOf(''))
-    parsed = parts.join('%')
-  } else {
-    parsed = mb
-  }
-  return parsed
-}
-
-function parseDash() {
-  var mb = getMBInfo()
-  if (mb.lastIndexOf(' ') != -1) {
-    var parsed;
-    var parts = mb.split(" ")
-    parts.splice(parts.indexOf(''))
-    parsed = parts.join('-')
-  } else {
-    parsed = mb
-  }
-  return parsed
-}
-
 function main() {
   //start the browser and create a browser instance
   let browserInstance = startBrowser();
-  let url = craftURL()
+  let a = 'MPG-Z590-GAMING-CARBON-WIFI' //testing variable.
+  let url = craftURL(a)
+  
+  console.log(getMBInfo(a))
+  console.log(parseDash(a))
+  console.log(parsePercent(a))
+  console.log(getCPUInfo())
+  console.log(getManufacturer())
+  console.log(getMSIURL(a))
+  console.log(getASROCKURL(a))
+  console.log(getAORUSURL(a))
+  console.log(getASUSURL(a))
 
   //pass browser instance and url to the scraper
   scrapeAll(browserInstance, url)
 }
 
-function craftURL() {
+function craftURL(a) {
   var url;
   if (getManufacturer() === 'MSI') {
-    url = getMSIURL()
+    url = getMSIURL(a)
   }
   else if (getManufacturer() === 'ASUS') {
-    url = getASUSURL()
+    url = getASUSURL(a)
   }
   else if (getManufacturer() === 'AORUS') {
-    url = getAORUSURL()
+    url = getAORUSURL(a)
   }
   else if (getManufacturer() === 'ASROCK') {
-    url = getASROCKURL()
+    url = getASROCKURL(a)
   }
   return url
 }
@@ -141,25 +121,54 @@ function getMBInfo() {
   return z
 }
 
-function getPCName() {
-  var name = execSync('echo %computername%').toString().trim()
-  return name
+function parsePercent(a) {
+  var mb = getMBInfo()
+  if (a === "") {
+    if (mb.lastIndexOf(' ') != -1) {
+      var parsed;
+      var parts = mb.split(" ")
+      parts.splice(parts.indexOf(''))
+      parsed = parts.join('%')
+    } else {
+      parsed = mb
+    }
+    return parsed
+  } else {
+    return a
+  }
 }
 
-function getMSIURL() {
-  return 'https://www.msi.com/Motherboard/support/' + parseDash() + '#down-driver&Win10%2064'
+function parseDash(a) {
+  var mb = getMBInfo()
+  if (a === "") {
+    if (mb.lastIndexOf(' ') != -1) {
+      var parsed;
+      var parts = mb.split(" ")
+      parts.splice(parts.indexOf(''))
+      parsed = parts.join('-')
+    } else {
+      parsed = mb
+    }
+    return parsed
+  } else {
+    return a
+  }
 }
 
-function getASROCKURL() {
-  return 'https://www.asrock.com/mb/' + getCPUInfo() + '/' + parsePercent() + '/index.us.asp#Download'
+function getMSIURL(a) {
+  return 'https://www.msi.com/Motherboard/support/' + parseDash(a) + '#down-driver&Win10%2064'
 }
 
-function getAORUSURL() {
-  return 'https://www.gigabyte.com/Motherboard/' + parseDash() + '/support#support-dl-driver'
+function getASROCKURL(a) {
+  return 'https://www.asrock.com/mb/' + getCPUInfo() + '/' + parsePercent(a) + '/index.us.asp#Download'
 }
 
-function getASUSURL() {
-  return 'https://www.asus.com/us/Motherboards-Components/Motherboards/All-series/' + parseDash() + '/HelpDesk_Download/'
+function getAORUSURL(a) {
+  return 'https://www.gigabyte.com/Motherboard/' + parseDash(a) + '/support#support-dl-driver'
+}
+
+function getASUSURL(a) {
+  return 'https://www.asus.com/us/Motherboards-Components/Motherboards/All-series/' + parseDash(a) + '/HelpDesk_Download/'
 }
 
 function getCPUInfo() {
