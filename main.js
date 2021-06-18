@@ -16,22 +16,6 @@ const createWindow = () => {
   mainWindow.loadFile(path.join(__dirname, './assets/html/index.html'));
 };
 
-const pageScraper = {
-  async scraper(browser, url) {
-    let page = await browser.newPage();
-    console.log(`Navigating to ` + url + `...`);
-    await page.goto(url);
-    //MSI
-    scrapeMSI(page)
-    //ASROCK
-    //scrapeASROCK(page)
-    //GIGABYTE
-    //scrapeGIGABYTE(page)
-    //ASUS
-    //scrapeASUS(page)
-  }
-}
-
 async function scrapeMSI(page) {
   await page.waitForSelector('.hvr-bob');
   const hrefs = await page.$$eval('a', as => as.map(a => a.href)
@@ -45,6 +29,25 @@ app.on('ready', createWindow);
 ipc.on('TESTING_1', function () {
   main()
 })
+
+function main() {
+  //start the browser and create a browser instance
+  let browserInstance = startBrowser();
+  let brand = getManufacturer();
+  let a = 'PRIME Z590-P WIFI'                                                      //testing mb name
+  let b = 'ASUS'                                                      //testing mb brand
+  let c = 'Intel'                                                      //testing cpu brand
+  let url = craftURL(a, b, c)
+
+  console.log(getMBInfo(a))
+  console.log(parseDash(a))
+  console.log(parsePercent(a))
+  console.log(getCPUInfo(c))
+  console.log(getManufacturer(b))
+
+  //pass browser instance and url to the scraper
+  scrapeAll(browserInstance, url, brand)
+}
 
 async function startBrowser() {
   let browser;
@@ -61,58 +64,57 @@ async function startBrowser() {
   return browser;
 }
 
-async function scrapeAll(browserInstance, url) {
+async function scraper(browser, url, brand) {
+  let page = await browser.newPage();
+  console.log(`Navigating to ` + url + `...`);
+  await page.goto(url);
+  //MSI
+  if (brand === 'MSI') {
+    scrapeMSI(page)
+  }
+  //ASROCK
+  //scrapeASROCK(page)
+  //GIGABYTE
+  //scrapeGIGABYTE(page)
+  //ASUS
+  //scrapeASUS(page)
+}
+
+async function scrapeAll(browserInstance, url, brand) {
   let browser;
   try {
     browser = await browserInstance;
-    await pageScraper.scraper(browser, url);
+    await scraper(browser, url, brand);
   }
   catch (err) {
     console.log("Could not resolve the browser instance => ", err);
   }
 }
 
-function main() {
-  //start the browser and create a browser instance
-  let browserInstance = startBrowser();
-  let a = 'TUF-GAMING-B550-PRO' //testing mb name
-  let b = 'ASUS'                //testing mb brand
-  let c = 'AMD'                 //testing cpu brand
-  let url = craftURL(a, b, c)
-
-  console.log(getMBInfo(a))
-  console.log(parseDash(a))
-  console.log(parsePercent(a))
-  console.log(getCPUInfo(c))
-  console.log(getManufacturer(b))
-  console.log(getMSIURL(a))
-  console.log(getASROCKURL(a))
-  console.log(getAORUSURL(a))
-  console.log(getASUSURL(a))
-
-  //pass browser instance and url to the scraper
-  scrapeAll(browserInstance, url)
-}
-
 function craftURL(a, b, c) {
   var url;
   if (getManufacturer(b) === 'MSI') {
-    url = getMSIURL(a)
+    url = 'https://www.msi.com/Motherboard/support/' + parseDash(a) + '#down-driver&Win10%2064'
   }
   else if (getManufacturer(b) === 'ASUS') {
-    url = getASUSURL(a)
+    url = 'https://www.asus.com/us/Motherboards-Components/Motherboards/All-series/' + parseDash(a) + '/HelpDesk_Download/'
   }
   else if (getManufacturer(b) === 'AORUS') {
-    url = getAORUSURL(a, c)
+    url = 'https://www.gigabyte.com/Motherboard/' + parseDash(a) + '/support#support-dl-driver'
   }
   else if (getManufacturer(b) === 'ASROCK') {
-    url = getASROCKURL(a)
+    url = 'https://www.asrock.com/mb/' + getCPUInfo(c) + '/' + parsePercent(a) + '/index.us.asp#Download'
   }
+  console.log(url)
   return url
 }
 
-function getMBInfo() {
-  var x = execSync('wmic baseboard get product').toString().replace("Product", "").trim()
+function getMBInfo(a) {
+  if (!a) {
+    var x = execSync('wmic baseboard get product').toString().replace("Product", "").trim()
+  } else {
+    x = a
+  }
   var y = x.lastIndexOf(' ')
   var z;
   if (y != -1) {
@@ -124,39 +126,41 @@ function getMBInfo() {
 }
 
 function parsePercent(a) {
-  var mb = getMBInfo()
+  var mb;
   if (!a) {
-    if (mb.lastIndexOf(' ') != -1) {
-      var parsed;
-      var parts = mb.split(" ")
-      parts.splice(parts.indexOf(''))
-      parsed = parts.join('%')
-    } else {
-      parsed = mb
-    }
-    return parsed
+    mb = getMBInfo()
   } else {
-    return a
+    mb = getMBInfo(a)
   }
+  if (mb.lastIndexOf(' ') != -1) {
+    var parsed;
+    var parts = mb.split(" ")
+    parts.splice(parts.indexOf(''))
+    parsed = parts.join('%')
+  } else {
+    parsed = mb
+  }
+  return parsed
 }
 
 function parseDash(a) {
-  var mb = getMBInfo()
+  var mb;
   if (!a) {
-    if (mb.lastIndexOf(' ') != -1) {
-      var parsed;
-      var parts = mb.split(" ")
-      parts.splice(parts.indexOf(''))
-      parsed = parts.join('-')
-    } else {
-      parsed = mb
-    }
-    return parsed
+    mb = getMBInfo()
   } else {
-    return a
+    mb = getMBInfo(a)
   }
+  if (mb.lastIndexOf(' ') != -1) {
+    var parsed;
+    var parts = mb.split(" ")
+    parts.splice(parts.indexOf(''))
+    parsed = parts.join('-')
+  } else {
+    parsed = mb
+  }
+  return parsed
 }
-
+/*
 function getMSIURL(a) {
   return 'https://www.msi.com/Motherboard/support/' + parseDash(a) + '#down-driver&Win10%2064'
 }
@@ -172,7 +176,7 @@ function getAORUSURL(a) {
 function getASUSURL(a) {
   return 'https://www.asus.com/us/Motherboards-Components/Motherboards/All-series/' + parseDash(a) + '/HelpDesk_Download/'
 }
-
+*/
 function getCPUInfo(c) {
   if (!c) {
     var cpu
