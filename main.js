@@ -27,7 +27,7 @@ function main() {
   let browserInstance = startBrowser();
   let brand = getManufacturer();
   //testing mb name
-  let a = 'ROG Crosshair VIII Hero'
+  let a = 'ROG RAMPAGE V EDITION 10'
   //testing mb brand
   let b = 'ASUS'
   //testing cpu brand
@@ -97,30 +97,31 @@ async function scrapeMSI(page) {
 }
 
 function craftURL(a, b, c) {
+  var mb = getMBInfo(a)
   var url;
   if (getManufacturer(b) === 'MSI') {
     url = 'https://www.msi.com/Motherboard/support/' + parseDash(a) + '#down-driver&Win10%2064'
-  }
-  else if (getManufacturer(b) === 'ASUS') {
-    if (getMBInfo(a).includes('Strix')) {
-      url = 'https://rog.asus.com/us/motherboards/rog-strix/' + parseRog(a)
-    } else if (getMBInfo(a).includes('Maximus')) {
-      url = 'https://rog.asus.com/us/motherboards/rog-maximus/' + parseRog(a)
-    } else if (getMBInfo(a).includes('Crosshair')) {
-      url = 'https://rog.asus.com/us/motherboards/rog-crosshair/' + parseRog(a)
-    } else if (getMBInfo(a).includes('Zenith')) {
-      url = 'https://rog.asus.com/us/motherboards/rog-zenith/' + parseRog(a)
-    } else if (getMBInfo(a).includes('Rampage')) {
-      url = 'https://rog.asus.com/us/motherboards/rog-rampage/' + parseRog(a)
-    } else {
-      url = 'https://www.asus.com/us/Motherboards-Components/Motherboards/All-series/' + parseDash(a) + '/HelpDesk_Download/'
-    }
   }
   else if (getManufacturer(b) === 'AORUS') {
     url = 'https://www.gigabyte.com/Motherboard/' + parseDash(a) + '/support#support-dl-driver'
   }
   else if (getManufacturer(b) === 'ASROCK') {
     url = 'https://www.asrock.com/mb/' + getCPUInfo(c) + '/' + parsePercent(a) + '/index.us.asp#Download'
+  }
+  else if (getManufacturer(b) === 'ASUS') {
+    if (mb.includes('Strix') || mb.includes('STRIX')) {
+      url = 'https://rog.asus.com/us/motherboards/rog-strix/' + parseRog(a)
+    } else if (mb.includes('Maximus') || mb.includes('MAXIMUS')) {
+      url = 'https://rog.asus.com/us/motherboards/rog-maximus/' + parseRog(a)
+    } else if (mb.includes('Crosshair') || mb.includes('CROSSHAIR')) {
+      url = 'https://rog.asus.com/us/motherboards/rog-crosshair/' + parseRog(a)
+    } else if (mb.includes('Zenith') || mb.includes('ZENITH')) {
+      url = 'https://rog.asus.com/us/motherboards/rog-zenith/' + parseRog(a)
+    } else if (mb.includes('Rampage') || mb.includes('RAMPAGE')) {
+      url = 'https://rog.asus.com/us/motherboards/rog-rampage/' + parseRog(a)
+    } else {
+      url = 'https://www.asus.com/us/Motherboards-Components/Motherboards/All-series/' + parseDash(a) + '/HelpDesk_Download/'
+    }
   }
   console.log(url)
   return url
@@ -173,8 +174,6 @@ function parseDash(a) {
     mb = getMBInfo(a)
   }
   if (mb.lastIndexOf(' ') != -1) {
-    console.log(mb)
-    console.log('test')
     var parsed;
     var parts = mb.split(' ')
     parsed = parts.join('-')
@@ -247,5 +246,8 @@ function getDrives() {
 //MEG-Z590-UNIFY
 //PRIME Z590-P WIFI
 //ProArt-B550-CREATOR
+//ROG Crosshair VIII Hero
+//ROG Strix TRX40-E Gaming
+//ROG Zenith II Extreme Alpha
 
 //wmic startup
