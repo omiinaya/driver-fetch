@@ -40,6 +40,7 @@ function main() {
   console.log(parsePercent(a))
   console.log(getCPUInfo(c))
   console.log(getManufacturer(b))
+  console.log(getDrives())
   //pass browser instance and url to the scraper
   scrapeAll(browserInstance, url, brand)
 }
@@ -191,21 +192,32 @@ function getManufacturer(b) {
     else if (parsed.includes('ASUSTeK')) {
       return 'ASUS'
     }
-    /*
-    else if (parsed.includes('AORUS')) {
-      return 'AORUS'
-    }
-    else if (parsed.includes('ASROCK')) {
+	  //or name includes rog
+    else if (parsed.includes('ASRock')) {
       return 'ASROCK'
     }
-    */
+    else if (parsed.includes('Gigabyte')) {
+      return 'AORUS'
+    }
   } else {
     return b
   }
 }
+
+function getDrives() {
+  var output = execSync('wmic logicaldisk get name, size, volumename, description').toString()
+  var drives = output.split('\n').splice(1,x.length-1)
+  return drives
+}
+
+//disable onedrive starting up
+//initialize drives
+//partition drives if needed
 
 //tested: 
 //MPG-Z590-GAMING-CARBON-WIFI
 //MEG-Z590-UNIFY
 //PRIME Z590-P WIFI
 //ProArt-B550-CREATOR
+
+//wmic startup
