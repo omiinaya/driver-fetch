@@ -16,14 +16,6 @@ const createWindow = () => {
   mainWindow.loadFile(path.join(__dirname, './assets/html/index.html'));
 };
 
-async function scrapeMSI(page) {
-  await page.waitForSelector('.hvr-bob');
-  const hrefs = await page.$$eval('a', as => as.map(a => a.href)
-    .filter(href => href.includes('https://download.msi.com/dvr_exe/'))
-  );
-  console.log(hrefs);
-}
-
 app.on('ready', createWindow);
 
 ipc.on('TESTING_1', function () {
@@ -34,17 +26,20 @@ function main() {
   //start the browser and create a browser instance
   let browserInstance = startBrowser();
   let brand = getManufacturer();
-  let a = 'PRIME Z590-P WIFI'                                                      //testing mb name
-  let b = 'ASUS'                                                      //testing mb brand
-  let c = 'Intel'                                                      //testing cpu brand
+  //testing mb name
+  let a = 'PRIME Z590-P WIFI'
+  //testing mb brand
+  let b = 'ASUS'
+  //testing cpu brand
+  let c = 'Intel'
+  //defining url and passing test vars
   let url = craftURL(a, b, c)
-
+  //logging vars for testing
   console.log(getMBInfo(a))
   console.log(parseDash(a))
   console.log(parsePercent(a))
   console.log(getCPUInfo(c))
   console.log(getManufacturer(b))
-
   //pass browser instance and url to the scraper
   scrapeAll(browserInstance, url, brand)
 }
@@ -89,6 +84,14 @@ async function scrapeAll(browserInstance, url, brand) {
   catch (err) {
     console.log("Could not resolve the browser instance => ", err);
   }
+}
+
+async function scrapeMSI(page) {
+  await page.waitForSelector('.hvr-bob');
+  const hrefs = await page.$$eval('a', as => as.map(a => a.href)
+    .filter(href => href.includes('https://download.msi.com/dvr_exe/'))
+  );
+  console.log(hrefs);
 }
 
 function craftURL(a, b, c) {
@@ -160,23 +163,7 @@ function parseDash(a) {
   }
   return parsed
 }
-/*
-function getMSIURL(a) {
-  return 'https://www.msi.com/Motherboard/support/' + parseDash(a) + '#down-driver&Win10%2064'
-}
 
-function getASROCKURL(a, c) {
-  return 'https://www.asrock.com/mb/' + getCPUInfo(c) + '/' + parsePercent(a) + '/index.us.asp#Download'
-}
-
-function getAORUSURL(a) {
-  return 'https://www.gigabyte.com/Motherboard/' + parseDash(a) + '/support#support-dl-driver'
-}
-
-function getASUSURL(a) {
-  return 'https://www.asus.com/us/Motherboards-Components/Motherboards/All-series/' + parseDash(a) + '/HelpDesk_Download/'
-}
-*/
 function getCPUInfo(c) {
   if (!c) {
     var cpu
