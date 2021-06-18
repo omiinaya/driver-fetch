@@ -75,9 +75,9 @@ async function scrapeAll(browserInstance, url) {
 function main() {
   //start the browser and create a browser instance
   let browserInstance = startBrowser();
-  let a = 'PRIME-Z590-P-WIFI' //testing mb name
-  let b = 'ASUS'              //testing mb brand
-  let c = 'Intel'             //testing cpu brand
+  let a = 'TUF-GAMING-B550-PRO' //testing mb name
+  let b = 'ASUS'                //testing mb brand
+  let c = 'AMD'                 //testing cpu brand
   let url = craftURL(a, b, c)
 
   console.log(getMBInfo(a))
@@ -216,3 +216,5 @@ function getManufacturer(b) {
 //tested: 
 //MPG-Z590-GAMING-CARBON-WIFI
 //MEG-Z590-UNIFY
+//PRIME Z590-P WIFI
+//ProArt-B550-CREATOR
