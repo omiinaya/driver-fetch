@@ -98,17 +98,18 @@ async function scrapeMSI(page) {
 
 function craftURL(a, b, c) {
   var mb = getMBInfo(a)
+  var brand = getManufacturer(b)
   var url;
-  if (getManufacturer(b) === 'MSI') {
+  if (brand === 'MSI') {
     url = 'https://www.msi.com/Motherboard/support/' + parseDash(a) + '#down-driver&Win10%2064'
   }
-  else if (getManufacturer(b) === 'AORUS') {
+  else if (brand === 'AORUS') {
     url = 'https://www.gigabyte.com/Motherboard/' + parseDash(a) + '/support#support-dl-driver'
   }
-  else if (getManufacturer(b) === 'ASROCK') {
+  else if (brand === 'ASROCK') {
     url = 'https://www.asrock.com/mb/' + getCPUInfo(c) + '/' + parsePercent(a) + '/index.us.asp#Download'
   }
-  else if (getManufacturer(b) === 'ASUS') {
+  else if (brand === 'ASUS') {
     if (mb.includes('Strix') || mb.includes('STRIX')) {
       url = 'https://rog.asus.com/us/motherboards/rog-strix/' + parseRog(a)
     } else if (mb.includes('Maximus') || mb.includes('MAXIMUS')) {
@@ -123,7 +124,6 @@ function craftURL(a, b, c) {
       url = 'https://www.asus.com/us/Motherboards-Components/Motherboards/All-series/' + parseDash(a) + '/HelpDesk_Download/'
     }
   }
-  console.log(url)
   return url
 }
 
@@ -214,16 +214,16 @@ function getManufacturer(b) {
   if (!b) {
     var output = execSync('wmic baseboard get manufacturer').toString()
     var parsed = output.replace("Manufacturer", "").trim()
-    if (parsed.includes('Micro-Star')) {
+    if (parsed.includes('Micro-Star') || parsed.includes('MSI')) {
       return 'MSI'
     }
-    else if (parsed.includes('ASUSTeK')) {
+    else if (parsed.includes('ASUSTeK') || parsed.includes('ASUS')) {
       return 'ASUS'
     }
     else if (parsed.includes('ASRock')) {
       return 'ASROCK'
     }
-    else if (parsed.includes('Gigabyte')) {
+    else if (parsed.includes('Gigabyte') || parsed.includes('Aorus')) {
       return 'AORUS'
     }
   } else {
