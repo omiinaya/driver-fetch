@@ -27,7 +27,7 @@ function main() {
   let browserInstance = startBrowser();
   let brand = getManufacturer();
   //testing mb name
-  let a = 'PRIME Z590-P WIFI'
+  let a = 'ROG Crosshair VIII Hero'
   //testing mb brand
   let b = 'ASUS'
   //testing cpu brand
@@ -41,6 +41,7 @@ function main() {
   console.log(getCPUInfo(c))
   console.log(getManufacturer(b))
   console.log(getDrives())
+  console.log(parseRog(a))
   //pass browser instance and url to the scraper
   scrapeAll(browserInstance, url, brand)
 }
@@ -101,7 +102,19 @@ function craftURL(a, b, c) {
     url = 'https://www.msi.com/Motherboard/support/' + parseDash(a) + '#down-driver&Win10%2064'
   }
   else if (getManufacturer(b) === 'ASUS') {
-    url = 'https://www.asus.com/us/Motherboards-Components/Motherboards/All-series/' + parseDash(a) + '/HelpDesk_Download/'
+    if (getMBInfo(a).includes('Strix')) {
+      url = 'https://rog.asus.com/us/motherboards/rog-strix/' + parseRog(a)
+    } else if (getMBInfo(a).includes('Maximus')) {
+      url = 'https://rog.asus.com/us/motherboards/rog-maximus/' + parseRog(a)
+    } else if (getMBInfo(a).includes('Crosshair')) {
+      url = 'https://rog.asus.com/us/motherboards/rog-crosshair/' + parseRog(a)
+    } else if (getMBInfo(a).includes('Zenith')) {
+      url = 'https://rog.asus.com/us/motherboards/rog-zenith/' + parseRog(a)
+    } else if (getMBInfo(a).includes('Rampage')) {
+      url = 'https://rog.asus.com/us/motherboards/rog-rampage/' + parseRog(a)
+    } else {
+      url = 'https://www.asus.com/us/Motherboards-Components/Motherboards/All-series/' + parseDash(a) + '/HelpDesk_Download/'
+    }
   }
   else if (getManufacturer(b) === 'AORUS') {
     url = 'https://www.gigabyte.com/Motherboard/' + parseDash(a) + '/support#support-dl-driver'
@@ -119,14 +132,19 @@ function getMBInfo(a) {
   } else {
     x = a
   }
+  /*
   var y = x.lastIndexOf(' ')
   var z;
   if (y != -1) {
     z = x.substring(0, y + 1)
+    console.log(z)
   } else {
     z = x
+    console.log(z)
   }
   return z
+  */
+  return x
 }
 
 function parsePercent(a) {
@@ -155,14 +173,25 @@ function parseDash(a) {
     mb = getMBInfo(a)
   }
   if (mb.lastIndexOf(' ') != -1) {
+    console.log(mb)
+    console.log('test')
     var parsed;
-    var parts = mb.split(" ")
-    parts.splice(parts.indexOf(''))
+    var parts = mb.split(' ')
     parsed = parts.join('-')
   } else {
     parsed = mb
   }
   return parsed
+}
+
+function parseRog(a) {
+  var rog;
+  if (!a) {
+    rog = parseDash() + "-model"
+  } else {
+    rog = parseDash(a) + "-model"
+  }
+  return rog.toLowerCase();
 }
 
 function getCPUInfo(c) {
@@ -192,7 +221,6 @@ function getManufacturer(b) {
     else if (parsed.includes('ASUSTeK')) {
       return 'ASUS'
     }
-	  //or name includes rog
     else if (parsed.includes('ASRock')) {
       return 'ASROCK'
     }
@@ -206,7 +234,7 @@ function getManufacturer(b) {
 
 function getDrives() {
   var output = execSync('wmic logicaldisk get name, size, volumename, description').toString()
-  var drives = output.split('\n').splice(1,x.length-1)
+  var drives = output.split('\n').splice(1, output.length - 1)
   return drives
 }
 
