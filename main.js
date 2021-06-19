@@ -25,13 +25,15 @@ ipc.on('TESTING_1', function () {
 function main() {
   //start the browser and create a browser instance
   let browserInstance = startBrowser();
-  let brand = getManufacturer();
-  //testing mb name
-  let a = 'Z590 OC Formula'
+
+  let a = 'Z490-A PRO'
   //testing mb brand
-  let b = 'ASROCK'
+  let b = 'MSI'
   //testing cpu brand
   let c = 'Intel'
+
+  let brand = getManufacturer(b);
+  //testing mb name
   //defining url and passing test vars
   let url = craftURL(a, b, c)
   //logging vars for testing
@@ -100,9 +102,8 @@ async function scrapeMSI(page) {
 }
 
 async function scrapeASROCK(page) {
-  //await page.waitForSelector('.hvr-bob');
   const hrefs = await page.$$eval('a', as => as.map(a => a.href)
-    .filter(href => href.includes('https://download.msi.com/dvr_exe/'))
+    .filter(href => href.includes('https://download.asrock.com/Drivers/'))
   );
   console.log(hrefs);
 }
@@ -266,5 +267,6 @@ function getDrives() {
 //Z490 AQUA
 //B550 Taichi
 //TRX40 Creator
+//Z490-A PRO
 
 //wmic startup
