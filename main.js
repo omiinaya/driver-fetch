@@ -27,11 +27,11 @@ function main() {
   let browserInstance = startBrowser();
   let brand = getManufacturer();
   //testing mb name
-  let a = 'ROG RAMPAGE V EDITION 10'
+  let a = 'TRX40 Creator'
   //testing mb brand
-  let b = 'ASUS'
+  let b = 'ASROCK'
   //testing cpu brand
-  let c = 'Intel'
+  let c = 'AMD'
   //defining url and passing test vars
   let url = craftURL(a, b, c)
   //logging vars for testing
@@ -40,7 +40,7 @@ function main() {
   console.log(parsePercent(a))
   console.log(getCPUInfo(c))
   console.log(getManufacturer(b))
-  console.log(getDrives())
+  //console.log(getDrives())
   console.log(parseRog(a))
   //pass browser instance and url to the scraper
   scrapeAll(browserInstance, url, brand)
@@ -68,8 +68,11 @@ async function scraper(browser, url, brand) {
   //MSI
   if (brand === 'MSI') {
     scrapeMSI(page)
+  } else if (brand === 'ASROCK') {
+    scrapeASROCK(page)
   }
   //ASROCK
+
   //scrapeASROCK(page)
   //GIGABYTE
   //scrapeGIGABYTE(page)
@@ -96,18 +99,30 @@ async function scrapeMSI(page) {
   console.log(hrefs);
 }
 
+async function scrapeASROCK(page) {
+  //await page.waitForSelector('.hvr-bob');
+  const hrefs = await page.$$eval('a', as => as.map(a => a.href)
+    .filter(href => href.includes('https://download.msi.com/dvr_exe/'))
+  );
+  console.log(hrefs);
+}
+
 function craftURL(a, b, c) {
   var mb = getMBInfo(a)
   var brand = getManufacturer(b)
   var url;
   if (brand === 'MSI') {
-    url = 'https://www.msi.com/Motherboard/support/' + parseDash(a) + '#down-driver&Win10%2064'
+    url = 'https://www.msi.com/Motherboard/support/' + parseDash(a).toUpperCase() + '#down-driver&Win10%2064'
   }
   else if (brand === 'AORUS') {
     url = 'https://www.gigabyte.com/Motherboard/' + parseDash(a) + '/support#support-dl-driver'
   }
   else if (brand === 'ASROCK') {
-    url = 'https://www.asrock.com/mb/' + getCPUInfo(c) + '/' + parsePercent(a) + '/index.us.asp#Download'
+    if (mb.includes('Aqua') || mb.includes('AQUA')) {
+      url = 'https://www.asrock.com/mb/' + getCPUInfo(c) + '/' + parsePercent(a).toUpperCase() + '/Specification.asp#Download'
+    } else {
+      url = 'https://www.asrock.com/mb/' + getCPUInfo(c) + '/' + parsePercent(a).toUpperCase() + '/index.asp#Download'
+    }
   }
   else if (brand === 'ASUS') {
     if (mb.includes('Strix') || mb.includes('STRIX')) {
@@ -158,8 +173,7 @@ function parsePercent(a) {
   if (mb.lastIndexOf(' ') != -1) {
     var parsed;
     var parts = mb.split(" ")
-    parts.splice(parts.indexOf(''))
-    parsed = parts.join('%')
+    parsed = parts.join('%20')
   } else {
     parsed = mb
   }
@@ -249,5 +263,8 @@ function getDrives() {
 //ROG Crosshair VIII Hero
 //ROG Strix TRX40-E Gaming
 //ROG Zenith II Extreme Alpha
+//Z490 AQUA
+//B550 Taichi
+//TRX40 Creator
 
 //wmic startup
