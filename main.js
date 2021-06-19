@@ -26,9 +26,9 @@ function main() {
   //start the browser and create a browser instance
   let browserInstance = startBrowser();
 
-  let a = 'Z590 AORUS XTREME (rev. 1.0)'
+  let a = 'ROG MAXIMUS X HERO'
   //testing mb brand
-  let b = 'AORUS'
+  let b = 'ASUS'
   //testing cpu brand
   let c = 'Intel'
 
@@ -75,10 +75,9 @@ async function scraper(browser, url, brand) {
     scrapeASROCK(page)
   } else if (brand === 'AORUS') {
     scrapeAORUS(page)
+  } else if (brand === 'ASUS') {
+    scrapeASUS(page)
   }
-
-  //ASUS
-  //scrapeASUS(page)
 }
 
 async function scrapeAll(browserInstance, url, brand) {
@@ -113,6 +112,14 @@ async function scrapeAORUS(page) {
   );
   console.log(hrefs);
 }
+async function scrapeASUS(page) {
+  const selectElem = await page.$('select[class="ProductSupportDriverBIOS__select__37dSG"]');
+  await selectElem.type('Windows 10 64-bit');
+  const hrefs = await page.$$eval('a', as => as.map(a => a.href)
+    .filter(href => href.includes('https://dlcdnets.asus.com/pub/'))
+  );
+  console.log(hrefs);
+}
 
 function craftURL(a, b, c) {
   var mb = getMBInfo(a)
@@ -133,17 +140,17 @@ function craftURL(a, b, c) {
   }
   else if (brand === 'ASUS') {
     if (mb.includes('Strix') || mb.includes('STRIX')) {
-      url = 'https://rog.asus.com/us/motherboards/rog-strix/' + parseRog(a)
+      url = 'https://rog.asus.com/motherboards/rog-strix/' + parseRog(a) + '/helpdesk_download'
     } else if (mb.includes('Maximus') || mb.includes('MAXIMUS')) {
-      url = 'https://rog.asus.com/us/motherboards/rog-maximus/' + parseRog(a)
+      url = 'https://rog.asus.com/motherboards/rog-maximus/' + parseRog(a) + '/helpdesk_download'
     } else if (mb.includes('Crosshair') || mb.includes('CROSSHAIR')) {
-      url = 'https://rog.asus.com/us/motherboards/rog-crosshair/' + parseRog(a)
+      url = 'https://rog.asus.com/motherboards/rog-crosshair/' + parseRog(a) + '/helpdesk_download'
     } else if (mb.includes('Zenith') || mb.includes('ZENITH')) {
-      url = 'https://rog.asus.com/us/motherboards/rog-zenith/' + parseRog(a)
+      url = 'https://rog.asus.com/motherboards/rog-zenith/' + parseRog(a) + '/helpdesk_download'
     } else if (mb.includes('Rampage') || mb.includes('RAMPAGE')) {
-      url = 'https://rog.asus.com/us/motherboards/rog-rampage/' + parseRog(a)
+      url = 'https://rog.asus.com/motherboards/rog-rampage/' + parseRog(a) + '/helpdesk_download'
     } else {
-      url = 'https://www.asus.com/us/Motherboards-Components/Motherboards/All-series/' + parseDash(a) + '/HelpDesk_Download/'
+      url = 'https://www.asus.com/Motherboards-Components/Motherboards/All-series/' + parseDash(a) + '/HelpDesk_Download/'
     }
   }
   return url
@@ -155,18 +162,6 @@ function getMBInfo(a) {
   } else {
     x = a
   }
-  /*
-  var y = x.lastIndexOf(' ')
-  var z;
-  if (y != -1) {
-    z = x.substring(0, y + 1)
-    console.log(z)
-  } else {
-    z = x
-    console.log(z)
-  }
-  return z
-  */
   return x
 }
 
@@ -295,5 +290,8 @@ function getDrives() {
 //B550 Taichi
 //TRX40 Creator
 //Z490-A PRO
+//Z590 AORUS XTREME (rev. 1.0)
+//Z590 GAMING X (rev. 1.0)
+//X570S AERO G (rev. 1.0)
 
 //wmic startup
