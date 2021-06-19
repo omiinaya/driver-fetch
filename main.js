@@ -26,9 +26,9 @@ function main() {
   //start the browser and create a browser instance
   let browserInstance = startBrowser();
 
-  let a = 'Z490-A PRO'
+  let a = 'Z590 AORUS XTREME (rev. 1.0)'
   //testing mb brand
-  let b = 'MSI'
+  let b = 'AORUS'
   //testing cpu brand
   let c = 'Intel'
 
@@ -44,6 +44,7 @@ function main() {
   console.log(getManufacturer(b))
   //console.log(getDrives())
   console.log(parseRog(a))
+  console.log(parseAorus(a))
   //pass browser instance and url to the scraper
   scrapeAll(browserInstance, url, brand)
 }
@@ -67,17 +68,15 @@ async function scraper(browser, url, brand) {
   let page = await browser.newPage();
   console.log(`Navigating to ` + url + `...`);
   await page.goto(url);
-  //MSI
+
   if (brand === 'MSI') {
     scrapeMSI(page)
   } else if (brand === 'ASROCK') {
     scrapeASROCK(page)
+  } else if (brand === 'AORUS') {
+    scrapeAORUS(page)
   }
-  //ASROCK
 
-  //scrapeASROCK(page)
-  //GIGABYTE
-  //scrapeGIGABYTE(page)
   //ASUS
   //scrapeASUS(page)
 }
@@ -108,6 +107,13 @@ async function scrapeASROCK(page) {
   console.log(hrefs);
 }
 
+async function scrapeAORUS(page) {
+  const hrefs = await page.$$eval('a', as => as.map(a => a.href)
+    .filter(href => href.includes('https://download.gigabyte.com/FileList/Driver/'))
+  );
+  console.log(hrefs);
+}
+
 function craftURL(a, b, c) {
   var mb = getMBInfo(a)
   var brand = getManufacturer(b)
@@ -116,7 +122,7 @@ function craftURL(a, b, c) {
     url = 'https://www.msi.com/Motherboard/support/' + parseDash(a).toUpperCase() + '#down-driver&Win10%2064'
   }
   else if (brand === 'AORUS') {
-    url = 'https://www.gigabyte.com/Motherboard/' + parseDash(a) + '/support#support-dl-driver'
+    url = 'https://www.gigabyte.com/Motherboard/' + parseAorus(a) + '/support#support-dl-driver'
   }
   else if (brand === 'ASROCK') {
     if (mb.includes('Aqua') || mb.includes('AQUA') || mb.includes('Formula') || mb.includes('FORMULA')) {
@@ -206,6 +212,27 @@ function parseRog(a) {
     rog = parseDash(a) + "-model"
   }
   return rog.toLowerCase();
+}
+
+function parseAorus(a) {
+  var mb;
+  if (!a) {
+    mb = getMBInfo()
+  } else {
+    mb = getMBInfo(a)
+  }
+  if (mb.lastIndexOf(' ') != -1) {
+    var parsed;
+    var parts = mb
+      .replaceAll('(', '')
+      .replaceAll(')', '')
+      .replaceAll('.', '')
+      .split(' ')
+    parsed = parts.join('-')
+  } else {
+    parsed = mb
+  }
+  return parsed
 }
 
 function getCPUInfo(c) {
