@@ -27,11 +27,11 @@ function main() {
   let browserInstance = startBrowser();
   let brand = getManufacturer();
   //testing mb name
-  let a = 'TRX40 Creator'
+  let a = 'Z590 OC Formula'
   //testing mb brand
   let b = 'ASROCK'
   //testing cpu brand
-  let c = 'AMD'
+  let c = 'Intel'
   //defining url and passing test vars
   let url = craftURL(a, b, c)
   //logging vars for testing
@@ -118,7 +118,7 @@ function craftURL(a, b, c) {
     url = 'https://www.gigabyte.com/Motherboard/' + parseDash(a) + '/support#support-dl-driver'
   }
   else if (brand === 'ASROCK') {
-    if (mb.includes('Aqua') || mb.includes('AQUA')) {
+    if (mb.includes('Aqua') || mb.includes('AQUA') || mb.includes('Formula') || mb.includes('FORMULA')) {
       url = 'https://www.asrock.com/mb/' + getCPUInfo(c) + '/' + parsePercent(a).toUpperCase() + '/Specification.asp#Download'
     } else {
       url = 'https://www.asrock.com/mb/' + getCPUInfo(c) + '/' + parsePercent(a).toUpperCase() + '/index.asp#Download'
