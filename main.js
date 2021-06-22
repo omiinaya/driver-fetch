@@ -26,11 +26,11 @@ function main() {
   //start the browser and create a browser instance
   let browserInstance = startBrowser();
 
-  let a = 'ROG MAXIMUS X HERO'
+  let a = ''
   //testing mb brand
-  let b = 'ASUS'
+  let b = ''
   //testing cpu brand
-  let c = 'Intel'
+  let c = ''
 
   let brand = getManufacturer(b);
   //testing mb name
@@ -112,6 +112,7 @@ async function scrapeAORUS(page) {
   );
   console.log(hrefs);
 }
+
 async function scrapeASUS(page) {
   const selectElem = await page.$('select[class="ProductSupportDriverBIOS__select__37dSG"]');
   await selectElem.type('Windows 10 64-bit');
@@ -158,11 +159,18 @@ function craftURL(a, b, c) {
 
 function getMBInfo(a) {
   if (!a) {
-    var x = execSync('wmic baseboard get product').toString().replace("Product", "").trim()
+    var x, y, z;
+    if (getManufacturer() === 'MSI') {
+      x = execSync('wmic baseboard get product')
+      y = x.toString().replace("Product", "").trim()
+      z = y.substring(0, y.indexOf('(')).trim()
+    } else {
+      z = execSync('wmic baseboard get product').toString().replace("Product", "").trim()
+    }
   } else {
-    x = a
+    z = a
   }
-  return x
+  return z
 }
 
 function parsePercent(a) {
@@ -269,7 +277,7 @@ function getManufacturer(b) {
 }
 
 function getDrives() {
-  var output = execSync('wmic logicaldisk get name, size, volumename, description').toString()
+  var output = execSync('wmic logicaldisk get name, size, volumename, filesystem').toString()
   var drives = output.split('\n').splice(1, output.length - 1)
   return drives
 }
