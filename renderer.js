@@ -13,10 +13,6 @@ function start() {
   ipc.send("TESTING_1")
 }
 
-function test() {
-  ipc.send("TESTING_2")
-}
-
 function closeNotification() {
   notification.classList.add('hidden');
 }
@@ -35,4 +31,8 @@ ipc.on('update_downloaded', () => {
   message.innerText = 'Update Downloaded. It will be installed on restart. Restart now?';
   restartButton.classList.remove('hidden');
   notification.classList.remove('hidden');
+});
+
+ipc.on('LOG_REQUEST', (evt, data) => {
+  console.log(data)
 });

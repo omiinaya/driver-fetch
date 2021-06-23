@@ -16,7 +16,8 @@ const createWindow = () => {
     width: 400,
     height: 200,
     webPreferences: {
-      nodeIntegration: true
+      nodeIntegration: true,
+      enableRemoteModule: true
     }
   });
   mainWindow.loadFile(path.join(__dirname, './assets/html/index.html'));
@@ -42,10 +43,6 @@ ipc.on('TESTING_1', function () {
   main()
 })
 
-ipc.on('TESTING_2', function () {
-  console.log(selectDirectory())
-})
-
 function main() {
   //start the browser and create a browser instance
   let browserInstance = startBrowser();
@@ -62,13 +59,13 @@ function main() {
   let url = craftURL(a, b, c)
   //logging vars for testing
 
-  //console.log(getMBInfo(a))
-  //console.log(parseDash(a))
-  //console.log(parsePercent(a))
-  //console.log(getCPUInfo(c))
-  //console.log(getManufacturer(b))
-  //console.log(parseRog(a))
-  //console.log(parseAorus(a))
+  print(getMBInfo(a))
+  print(parseDash(a))
+  print(parsePercent(a))
+  print(getCPUInfo(c))
+  print(getManufacturer(b))
+  print(parseRog(a))
+  print(parseAorus(a))
 
   //pass browser instance and url to the scraper
   scrapeAll(browserInstance, url, brand, a, b, c)
@@ -77,14 +74,14 @@ function main() {
 async function startBrowser() {
   let browser;
   try {
-    console.log("Opening the browser......");
+    print("Opening the browser......");
     browser = await puppeteer.launch({
       headless: false,
       args: ["--disable-setuid-sandbox"],
       'ignoreHTTPSErrors': true
     });
   } catch (err) {
-    console.log("Could not create a browser instance => : ", err);
+    print("Could not create a browser instance => : ", err);
   }
   return browser;
 }
@@ -98,7 +95,7 @@ async function scraper(browser, url, brand, a, b, c) {
     else
       request.continue();
   })
-  console.log(`Navigating to ` + url + `...`);
+  print(`Navigating to ` + url + `...`);
   await page.goto(url, {
     waitUntil: "networkidle2"
   });
@@ -121,7 +118,7 @@ async function scrapeAll(browserInstance, url, brand, a, b, c) {
     await scraper(browser, url, brand, a, b, c);
   }
   catch (err) {
-    console.log("Could not resolve the browser instance => ", err);
+    print("Could not resolve the browser instance => ", err);
   }
 }
 
@@ -130,7 +127,7 @@ async function scrapeMSI(page, a, b, c) {
   const hrefs = await page.$$eval('a', as => as.map(a => a.href)
     .filter(href => href.includes('https://download.msi.com/dvr_exe/'))
   );
-  console.log(hrefs);
+  print(hrefs);
   selectDirectory().then((directory) => {
     if (directory) {
       hrefs.forEach(url => {
@@ -146,7 +143,7 @@ async function scrapeASROCK(page, a, b, c) {
   const hrefs = await page.$$eval('a', as => as.map(a => a.href)
     .filter(href => href.includes('https://download.asrock.com/Drivers/'))
   );
-  console.log(hrefs);
+  print(hrefs);
   selectDirectory().then((directory) => {
     if (directory) {
       hrefs.forEach(url => {
@@ -162,7 +159,7 @@ async function scrapeAORUS(page, a, b, c) {
   const hrefs = await page.$$eval('a', as => as.map(a => a.href)
     .filter(href => href.includes('https://download.gigabyte.com/FileList/Driver/'))
   );
-  console.log(hrefs);
+  print(hrefs);
   selectDirectory().then((directory) => {
     if (directory) {
       hrefs.forEach(url => {
@@ -181,7 +178,7 @@ async function scrapeASUS(page, a, b, c) {
   const hrefs = await page.$$eval('a', as => as.map(a => a.href)
     .filter(href => href.includes('https://dlcdnets.asus.com/pub/'))
   );
-  console.log(hrefs);
+  print(hrefs);
   selectDirectory().then((directory) => {
     if (directory) {
       hrefs.forEach(url => {
@@ -364,7 +361,7 @@ function getFilePath(url, directory, a, b, c) {
 async function ifNotExistCreateDir(url, directory) {
   var name = url.substring(url.lastIndexOf('/') + 1, url.length)
   var path = directory.replace(name, '')
-  console.log(path)
+  print(path)
   try {
     return execSync('dir ' + path).toString().trim()
   } catch (error) {
@@ -378,8 +375,8 @@ async function ifNotExistCreateDir(url, directory) {
 }
 
 function dl(url, directory, a, b, c) {
-  console.log(url)
-  console.log(directory)
+  print(url)
+  print(directory)
   ifNotExistCreateDir(url, directory)
   var file = fs.createWriteStream(directory);
   https.get(url, function (response) {
@@ -423,6 +420,10 @@ async function selectDirectory() {
   if (result) {
     return result.filePaths[0]
   }
+}
+
+function print(a) {
+  window.webContents.send('LOG_REQUEST', a);
 }
 
 
