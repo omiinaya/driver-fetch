@@ -4,6 +4,8 @@ const { execSync } = require('child_process')
 const ipc = require('electron').ipcMain
 const puppeteer = require('puppeteer');
 const path = require('path');
+const https = require('https')
+const fs = require("fs");
 
 const createWindow = () => {
   const mainWindow = new BrowserWindow({
@@ -96,7 +98,9 @@ async function scrapeMSI(page) {
   const hrefs = await page.$$eval('a', as => as.map(a => a.href)
     .filter(href => href.includes('https://download.msi.com/dvr_exe/'))
   );
-  console.log(hrefs);
+  hrefs.forEach(href => {
+    dl(href, getFileName(href))
+  })
 }
 
 async function scrapeASROCK(page) {
@@ -276,11 +280,35 @@ function getManufacturer(b) {
   }
 }
 
-function getDrives() {
-  var output = execSync('wmic logicaldisk get name, size, volumename, filesystem').toString()
-  var drives = output.split('\n').splice(1, output.length - 1)
-  return drives
+function getFileName(a) {
+  return a.substring(a.lastIndexOf('/') + 1, a.length)
 }
+
+async function ifNotExistCreateDir(directory, filename) {
+  try {
+    return execSync('dir ' + directory).toString().trim()
+  } catch (error) {
+    var condition = error.stderr.toString()
+    if (condition.includes('cannot find')) {
+      return execSync('mkdir ' + directory).toString().trim()
+    }
+  }
+}
+
+function dl(url, filename) {
+  var mb = getMBInfo()
+  var dir = __dirname + "\\drivers\\" + mb + "\\"
+  var directory = parseDash(dir)
+  var path = directory + "\\" + filename
+  ifNotExistCreateDir(directory, filename)
+  
+  var file = fs.createWriteStream(path);
+  https.get(url, function (response) {
+    response.pipe(file);
+  });
+  
+}
+
 
 //disable onedrive starting up
 //initialize drives
