@@ -1,10 +1,12 @@
 require('electron-reload')(__dirname, { ignored: /db|[\/\\]\./, argv: [] });
+const delay = ms => new Promise(res => setTimeout(res, ms));
 const { app, BrowserWindow } = require('electron');
 const { execSync } = require('child_process')
 const ipc = require('electron').ipcMain
 const puppeteer = require('puppeteer');
 const path = require('path');
 const https = require('https')
+
 const fs = require("fs");
 
 const createWindow = () => {
@@ -28,9 +30,9 @@ function main() {
   //start the browser and create a browser instance
   let browserInstance = startBrowser();
 
-  let a = ''
+  let a = 'ProArt-B550-CREATOR'
   //testing mb brand
-  let b = ''
+  let b = 'ASUS'
   //testing cpu brand
   let c = ''
 
@@ -48,7 +50,7 @@ function main() {
   console.log(parseRog(a))
   console.log(parseAorus(a))
   //pass browser instance and url to the scraper
-  scrapeAll(browserInstance, url, brand)
+  scrapeAll(browserInstance, url, brand, a, b, c)
 }
 
 async function startBrowser() {
@@ -66,64 +68,77 @@ async function startBrowser() {
   return browser;
 }
 
-async function scraper(browser, url, brand) {
+async function scraper(browser, url, brand, a, b, c) {
   let page = await browser.newPage();
   console.log(`Navigating to ` + url + `...`);
-  await page.goto(url);
+  await page.goto(url, {
+    waitUntil: "networkidle2"
+  });
 
   if (brand === 'MSI') {
-    scrapeMSI(page)
+    scrapeMSI(page, a, b, c)
   } else if (brand === 'ASROCK') {
-    scrapeASROCK(page)
+    scrapeASROCK(page, a, b, c)
   } else if (brand === 'AORUS') {
-    scrapeAORUS(page)
+    scrapeAORUS(page, a, b, c)
   } else if (brand === 'ASUS') {
-    scrapeASUS(page)
+    scrapeASUS(page, a, b, c)
   }
 }
 
-async function scrapeAll(browserInstance, url, brand) {
+async function scrapeAll(browserInstance, url, brand, a, b, c) {
   let browser;
   try {
     browser = await browserInstance;
-    await scraper(browser, url, brand);
+    await scraper(browser, url, brand, a, b, c);
   }
   catch (err) {
     console.log("Could not resolve the browser instance => ", err);
   }
 }
 
-async function scrapeMSI(page) {
+async function scrapeMSI(page, a, b, c) {
   await page.waitForSelector('.hvr-bob');
   const hrefs = await page.$$eval('a', as => as.map(a => a.href)
     .filter(href => href.includes('https://download.msi.com/dvr_exe/'))
   );
+  console.log(hrefs);
   hrefs.forEach(href => {
-    dl(href, getFileName(href))
+    dl(href, getFileName(href), a, b, c)
   })
 }
 
-async function scrapeASROCK(page) {
+async function scrapeASROCK(page, a, b, c) {
   const hrefs = await page.$$eval('a', as => as.map(a => a.href)
     .filter(href => href.includes('https://download.asrock.com/Drivers/'))
   );
   console.log(hrefs);
+  hrefs.forEach(href => {
+    dl(href, getFileName(href), a, b, c)
+  })
 }
 
-async function scrapeAORUS(page) {
+async function scrapeAORUS(page, a, b, c) {
   const hrefs = await page.$$eval('a', as => as.map(a => a.href)
     .filter(href => href.includes('https://download.gigabyte.com/FileList/Driver/'))
   );
   console.log(hrefs);
+  hrefs.forEach(href => {
+    dl(href, getFileName(href), a, b, c)
+  })
 }
 
-async function scrapeASUS(page) {
-  const selectElem = await page.$('select[class="ProductSupportDriverBIOS__select__37dSG"]');
+async function scrapeASUS(page, a, b, c) {
+  const selectElem = await page.$('select[class^="ProductSupportDriverBIOS__select__"]');
   await selectElem.type('Windows 10 64-bit');
+  await delay(2000)
   const hrefs = await page.$$eval('a', as => as.map(a => a.href)
     .filter(href => href.includes('https://dlcdnets.asus.com/pub/'))
   );
   console.log(hrefs);
+  hrefs.forEach(href => {
+    dl(href, getFileName(href), a, b, c)
+  })
 }
 
 function craftURL(a, b, c) {
@@ -188,8 +203,9 @@ function parsePercent(a) {
     var parsed;
     var parts = mb.split(" ")
     parsed = parts.join('%20')
+    parsed.replaceAll('/', '')
   } else {
-    parsed = mb
+    parsed = mb.replaceAll('/', '')
   }
   return parsed
 }
@@ -205,8 +221,9 @@ function parseDash(a) {
     var parsed;
     var parts = mb.split(' ')
     parsed = parts.join('-')
+    parsed.replaceAll('/', '')
   } else {
-    parsed = mb
+    parsed = mb.replaceAll('/', '')
   }
   return parsed
 }
@@ -295,18 +312,30 @@ async function ifNotExistCreateDir(directory, filename) {
   }
 }
 
-function dl(url, filename) {
-  var mb = getMBInfo()
-  var dir = __dirname + "\\drivers\\" + mb + "\\"
-  var directory = parseDash(dir)
-  var path = directory + "\\" + filename
-  ifNotExistCreateDir(directory, filename)
-  
-  var file = fs.createWriteStream(path);
-  https.get(url, function (response) {
-    response.pipe(file);
-  });
-  
+function dl(url, filename, a, b, c) {
+  if (!a) {
+    var mb = getMBInfo()
+    var dir = __dirname + "\\drivers\\" + mb + "\\"
+    var directory = parseDash(dir)
+    var path = directory + "\\" + filename
+    ifNotExistCreateDir(directory, filename)
+
+    var file = fs.createWriteStream(path);
+    https.get(url, function (response) {
+      response.pipe(file);
+    });
+  } else {
+    var mb = getMBInfo(a)
+    var dir = __dirname + "\\drivers\\" + mb + "\\"
+    var directory = parseDash(dir)
+    var path = directory + "\\" + filename
+    ifNotExistCreateDir(directory, filename)
+
+    var file = fs.createWriteStream(path);
+    https.get(url, function (response) {
+      response.pipe(file);
+    });
+  }
 }
 
 
