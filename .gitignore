@@ -10,6 +10,7 @@ node_modules/
 jspm_packages/
 drivers/
 dist/
+test-win32-x64/
 
 # dotenv environment variables file
 .env
