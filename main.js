@@ -1,14 +1,15 @@
 require('electron-reload')(__dirname, { ignored: /db|[\/\\]\./, argv: [] });
 const delay = ms => new Promise(res => setTimeout(res, ms));
-const { app, BrowserWindow } = require('electron');
+const { app, BrowserWindow, dialog } = require('electron');
 const { execSync } = require('child_process')
 const ipc = require('electron').ipcMain
 const puppeteer = require('puppeteer');
 const path = require('path');
 const https = require('https')
 const { autoUpdater } = require('electron-updater');
-
 const fs = require("fs");
+
+let window;
 
 const createWindow = () => {
   const mainWindow = new BrowserWindow({
@@ -27,10 +28,12 @@ const createWindow = () => {
   autoUpdater.on('update-available', () => {
     mainWindow.webContents.send('update_available');
   });
-  
+
   autoUpdater.on('update-downloaded', () => {
     mainWindow.webContents.send('update_downloaded');
   });
+
+  window = mainWindow;
 };
 
 app.on('ready', createWindow);
@@ -39,15 +42,19 @@ ipc.on('TESTING_1', function () {
   main()
 })
 
+ipc.on('TESTING_2', function () {
+  console.log(selectDirectory())
+})
+
 function main() {
   //start the browser and create a browser instance
   let browserInstance = startBrowser();
 
-  let a = 'B550 Taichi'
+  let a = ''
   //testing mb brand
-  let b = 'ASROCK'
+  let b = ''
   //testing cpu brand
-  let c = 'AMD'
+  let c = ''
 
   let brand = getManufacturer(b);
   //testing mb name
@@ -115,9 +122,12 @@ async function scrapeMSI(page, a, b, c) {
     .filter(href => href.includes('https://download.msi.com/dvr_exe/'))
   );
   console.log(hrefs);
-  hrefs.forEach(href => {
-    dl(href, getFileName(href), a, b, c)
+  selectDirectory().then((data) => {
+    hrefs.forEach(href => {
+      dl(href, getFilePath(href, data), a, b, c)
+    })
   })
+  
 }
 
 async function scrapeASROCK(page, a, b, c) {
@@ -309,24 +319,38 @@ function getManufacturer(b) {
   }
 }
 
-function getFileName(a) {
-  return a.substring(a.lastIndexOf('/') + 1, a.length)
+function getFilePath(url, b) {
+  var name = url.substring(url.lastIndexOf('/') + 1, url.length)
+  var path = b + '\\drivers\\' + parseDash() + '\\' + name
+  return path
 }
 
-async function ifNotExistCreateDir(directory, filename) {
+async function ifNotExistCreateDir(url, directory) {
+  var name = url.substring(url.lastIndexOf('/') + 1, url.length)
+  var path = directory.replace(name, '')
+  console.log(path)
   try {
-    return execSync('dir ' + directory).toString().trim()
+    return execSync('dir ' + path).toString().trim()
   } catch (error) {
     var condition = error.stderr.toString()
     if (condition.includes('cannot find')) {
-      return execSync('mkdir ' + directory).toString().trim()
+      return execSync('mkdir ' + path).toString().trim()
     }
   } finally {
     //code that executes after try only if there was no catch
   }
 }
 
-function dl(url, filename, a, b, c) {
+
+function dl(url, directory, a, b, c) {
+  console.log(url) 
+  console.log(directory)
+  ifNotExistCreateDir(url, directory)
+  var file = fs.createWriteStream(directory);
+    https.get(url, function (response) {
+      response.pipe(file);
+    });
+  /*
   if (!a) {
     var mb = getMBInfo()
     var dir = __dirname + "\\drivers\\" + mb + "\\"
@@ -350,6 +374,18 @@ function dl(url, filename, a, b, c) {
       response.pipe(file);
     });
   }
+  */
+}
+
+async function selectDirectory() {
+  //defining type of selection and title
+  let options = {
+    title: "Where would you like to download your drivers?",
+    properties: ["openDirectory"]
+  }
+  //opening dialog and executing a function
+  const result = await dialog.showOpenDialog(window, options)
+  return result.filePaths[0]
 }
 
 

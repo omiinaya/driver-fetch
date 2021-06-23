@@ -13,6 +13,10 @@ function start() {
   ipc.send("TESTING_1")
 }
 
+function test() {
+  ipc.send("TESTING_2")
+}
+
 function closeNotification() {
   notification.classList.add('hidden');
 }
