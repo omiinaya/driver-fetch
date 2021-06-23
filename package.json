@@ -7,8 +7,7 @@
     "server": "node server.js",
     "client": "electron .",
     "start": "electron .",
-    "build": "electron-packager . driver-fetch",
-    "deploy": "electron-builder build --mac --win --publish always",
+    "build": "electron-packager . driver-fetch --overwrite --platform=win32",
     "rebuild": "electron-rebuild -f -w main.js"
   },
   "repository": "https://github.com/omiinaya/driver-fetch",
