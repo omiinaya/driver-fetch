@@ -90,7 +90,7 @@ async function startBrowser() {
 }
 
 async function scraper(browser, url, brand, a, b, c) {
-  let page = await browser.newPage();
+  const [page] = await browser.pages()
   await page.setRequestInterception(true)
   page.on('request', request => {
     if (request.resourceType() === 'image' || request.resourceType() === 'stylesheet')
