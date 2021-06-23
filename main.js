@@ -30,7 +30,7 @@ function main() {
   //start the browser and create a browser instance
   let browserInstance = startBrowser();
 
-  let a = 'ProArt-B550-CREATOR'
+  let a = 'TUF GAMING B560M-E'
   //testing mb brand
   let b = 'ASUS'
   //testing cpu brand
@@ -46,7 +46,6 @@ function main() {
   console.log(parsePercent(a))
   console.log(getCPUInfo(c))
   console.log(getManufacturer(b))
-  //console.log(getDrives())
   console.log(parseRog(a))
   console.log(parseAorus(a))
   //pass browser instance and url to the scraper
@@ -72,7 +71,7 @@ async function scraper(browser, url, brand, a, b, c) {
   let page = await browser.newPage();
   console.log(`Navigating to ` + url + `...`);
   await page.goto(url, {
-    waitUntil: "networkidle2"
+    waitUntil: "networkidle0"
   });
 
   if (brand === 'MSI') {

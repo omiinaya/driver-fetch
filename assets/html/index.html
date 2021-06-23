@@ -7,14 +7,23 @@
   <script defer src="../../renderer.js"></script>
 </head>
 
-<body class="content">
-  <select id="Manufacturers">
-    <option value="MSI">MSI</option>
-    <option value="ASUS">ASUS</option>
-    <option value="AORUS">AORUS</option>
-    <option value="ASROCK">ASROCK</option>
-  </select>
-  <button onClick=start()>Start</button>
+<body>
+  <div class="content">
+    <div>
+      <select class="selectors" id="manufacturers">
+        <option value="0">MSI</option>
+        <option value="1">ASUS</option>
+        <option value="2">AORUS</option>
+        <option value="3">ASROCK</option>
+      </select>
+      <select class="selectors" id="processors">
+        <option value="0">Intel</option>
+        <option value="1">AMD</option>
+      </select>
+      <input id="motherboard" placeholder="Motherboard name."></input>
+    </div>
+    <button id="startbutton" onClick=start()>Start</button>
+  </div>
 </body>
 
 </html>

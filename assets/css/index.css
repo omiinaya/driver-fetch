@@ -4,13 +4,17 @@ body {
   margin: 0;
 }
 
-
-video {
-  width: 100%;
-  height: auto;
-}
-
 body {
   text-align: center;
   padding-top: 20px;
+}
+
+#startbutton {
+  margin: 0 auto;
+  width: 83.5%;
+  height: 50px;
+}
+
+.content {
+
 }
