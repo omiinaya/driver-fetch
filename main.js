@@ -19,8 +19,17 @@ const createWindow = () => {
     }
   });
   mainWindow.loadFile(path.join(__dirname, './assets/html/index.html'));
+
   mainWindow.once('ready-to-show', () => {
     autoUpdater.checkForUpdatesAndNotify();
+  });
+
+  autoUpdater.on('update-available', () => {
+    mainWindow.webContents.send('update_available');
+  });
+  
+  autoUpdater.on('update-downloaded', () => {
+    mainWindow.webContents.send('update_downloaded');
   });
 };
 
@@ -366,12 +375,7 @@ function dl(url, filename, a, b, c) {
 
 //wmic startup
 
-autoUpdater.on('update-available', () => {
-  mainWindow.webContents.send('update_available');
-});
-autoUpdater.on('update-downloaded', () => {
-  mainWindow.webContents.send('update_downloaded');
-});
+
 
 ipc.on('restart_app', () => {
   autoUpdater.quitAndInstall();
