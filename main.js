@@ -50,9 +50,9 @@ function main() {
   //start the browser and create a browser instance
   let browserInstance = startBrowser();
 
-  let a = ''
+  let a = 'Z590 AORUS XTREME (rev. 1.0)'
   //testing mb brand
-  let b = ''
+  let b = 'AORUS'
   //testing cpu brand
   let c = ''
 
@@ -61,7 +61,7 @@ function main() {
   //defining url and passing test vars
   let url = craftURL(a, b, c)
   //logging vars for testing
-  /*
+  
   console.log(getMBInfo(a))
   console.log(parseDash(a))
   console.log(parsePercent(a))
@@ -69,7 +69,7 @@ function main() {
   console.log(getManufacturer(b))
   console.log(parseRog(a))
   console.log(parseAorus(a))
-  */
+  
   //pass browser instance and url to the scraper
   scrapeAll(browserInstance, url, brand, a, b, c)
 }
@@ -124,12 +124,11 @@ async function scrapeMSI(page, a, b, c) {
     .filter(href => href.includes('https://download.msi.com/dvr_exe/'))
   );
   console.log(hrefs);
-  selectDirectory().then((data) => {
-    hrefs.forEach(href => {
-      dl(href, getFilePath(href, data), a, b, c)
+  selectDirectory().then((directory) => {
+    hrefs.forEach(url => {
+      dl(url, getFilePath(url, directory, a, b, c), a, b, c)
     })
   })
-  
 }
 
 async function scrapeASROCK(page, a, b, c) {
@@ -137,8 +136,10 @@ async function scrapeASROCK(page, a, b, c) {
     .filter(href => href.includes('https://download.asrock.com/Drivers/'))
   );
   console.log(hrefs);
-  hrefs.forEach(href => {
-    dl(href, getFileName(href), a, b, c)
+  selectDirectory().then((directory) => {
+    hrefs.forEach(url => {
+      dl(url, getFilePath(url, directory, a, b, c), a, b, c)
+    })
   })
 }
 
@@ -147,8 +148,10 @@ async function scrapeAORUS(page, a, b, c) {
     .filter(href => href.includes('https://download.gigabyte.com/FileList/Driver/'))
   );
   console.log(hrefs);
-  hrefs.forEach(href => {
-    dl(href, getFileName(href), a, b, c)
+  selectDirectory().then((directory) => {
+    hrefs.forEach(url => {
+      dl(url, getFilePath(url, directory, a, b, c), a, b, c)
+    })
   })
 }
 
@@ -160,8 +163,10 @@ async function scrapeASUS(page, a, b, c) {
     .filter(href => href.includes('https://dlcdnets.asus.com/pub/'))
   );
   console.log(hrefs);
-  hrefs.forEach(href => {
-    dl(href, getFileName(href), a, b, c)
+  selectDirectory().then((directory) => {
+    hrefs.forEach(url => {
+      dl(url, getFilePath(url, directory, a, b, c), a, b, c)
+    })
   })
 }
 
@@ -321,10 +326,16 @@ function getManufacturer(b) {
   }
 }
 
-function getFilePath(url, b) {
-  var name = url.substring(url.lastIndexOf('/') + 1, url.length)
-  var path = b + '\\drivers\\' + parseDash() + '\\' + name
-  return path
+function getFilePath(url, directory, a, b, c) {
+  if (!a) {
+    var name = url.substring(url.lastIndexOf('/') + 1, url.length)
+    var path = directory + '\\drivers\\' + parseDash() + '\\' + name
+    return path
+  } else {
+    var name = url.substring(url.lastIndexOf('/') + 1, url.length)
+    var path = directory + '\\drivers\\' + parseDash(a) + '\\' + name
+    return path
+  }
 }
 
 async function ifNotExistCreateDir(url, directory) {
@@ -344,13 +355,13 @@ async function ifNotExistCreateDir(url, directory) {
 }
 
 function dl(url, directory, a, b, c) {
-  console.log(url) 
+  console.log(url)
   console.log(directory)
   ifNotExistCreateDir(url, directory)
   var file = fs.createWriteStream(directory);
-    https.get(url, function (response) {
-      response.pipe(file);
-    });
+  https.get(url, function (response) {
+    response.pipe(file);
+  });
   /*
   if (!a) {
     var mb = getMBInfo()

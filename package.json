@@ -1,13 +1,13 @@
 {
-  "name": "driver-get",
-  "version": "0.0.4",
+  "name": "driver-fetch",
+  "version": "0.0.5",
   "description": "A minimal electron application made to facilitate acquiring drivers.",
   "main": "main.js",
   "scripts": {
     "server": "node server.js",
     "client": "electron .",
     "start": "electron .",
-    "build": "electron-builder build --win --publish never",
+    "build": "electron-packager . driver-fetch",
     "deploy": "electron-builder build --mac --win --publish always",
     "rebuild": "electron-rebuild -f -w main.js"
   },
