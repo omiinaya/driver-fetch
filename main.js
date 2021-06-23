@@ -61,7 +61,7 @@ function main() {
   //defining url and passing test vars
   let url = craftURL(a, b, c)
   //logging vars for testing
-  
+
   //console.log(getMBInfo(a))
   //console.log(parseDash(a))
   //console.log(parsePercent(a))
@@ -69,7 +69,7 @@ function main() {
   //console.log(getManufacturer(b))
   //console.log(parseRog(a))
   //console.log(parseAorus(a))
-  
+
   //pass browser instance and url to the scraper
   scrapeAll(browserInstance, url, brand, a, b, c)
 }
@@ -92,12 +92,11 @@ async function startBrowser() {
 async function scraper(browser, url, brand, a, b, c) {
   let page = await browser.newPage();
   await page.setRequestInterception(true)
-  page.on('request', (request) => {
-    if (request.resourceType() === 'image') {
-      request.abort()
-    } else {
-      request.continue()
-    }
+  page.on('request', request => {
+    if (request.resourceType() === 'image' || request.resourceType() === 'stylesheet')
+      request.abort();
+    else
+      request.continue();
   })
   console.log(`Navigating to ` + url + `...`);
   await page.goto(url, {
