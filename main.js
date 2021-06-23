@@ -6,6 +6,7 @@ const ipc = require('electron').ipcMain
 const puppeteer = require('puppeteer');
 const path = require('path');
 const https = require('https')
+const { autoUpdater } = require('electron-updater');
 
 const fs = require("fs");
 
@@ -18,6 +19,9 @@ const createWindow = () => {
     }
   });
   mainWindow.loadFile(path.join(__dirname, './assets/html/index.html'));
+  mainWindow.once('ready-to-show', () => {
+    autoUpdater.checkForUpdatesAndNotify();
+  });
 };
 
 app.on('ready', createWindow);
@@ -30,11 +34,11 @@ function main() {
   //start the browser and create a browser instance
   let browserInstance = startBrowser();
 
-  let a = 'ROG Zenith II Extreme Alpha'
+  let a = 'B550 Taichi'
   //testing mb brand
-  let b = 'ASUS'
+  let b = 'ASROCK'
   //testing cpu brand
-  let c = ''
+  let c = 'AMD'
 
   let brand = getManufacturer(b);
   //testing mb name
@@ -308,6 +312,8 @@ async function ifNotExistCreateDir(directory, filename) {
     if (condition.includes('cannot find')) {
       return execSync('mkdir ' + directory).toString().trim()
     }
+  } finally {
+    //code that executes after try only if there was no catch
   }
 }
 
@@ -359,3 +365,14 @@ function dl(url, filename, a, b, c) {
 //X570S AERO G (rev. 1.0)
 
 //wmic startup
+
+autoUpdater.on('update-available', () => {
+  mainWindow.webContents.send('update_available');
+});
+autoUpdater.on('update-downloaded', () => {
+  mainWindow.webContents.send('update_downloaded');
+});
+
+ipc.on('restart_app', () => {
+  autoUpdater.quitAndInstall();
+});

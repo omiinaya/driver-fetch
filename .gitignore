@@ -1,5 +1,6 @@
 # Logs
 *.log
+electron-builder.yml
 
 # Compiled binary addons (https://nodejs.org/api/addons.html)
 build/Release
@@ -8,6 +9,7 @@ build/Release
 node_modules/
 jspm_packages/
 drivers/
+dist/
 
 # dotenv environment variables file
 .env

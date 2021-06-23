@@ -9,7 +9,7 @@
 
 <body>
   <div class="content">
-    <div class="override">
+    <div class="centered">
       <input type="checkbox" /><label>manual override</label>
     </div>
     <div class="centered">
@@ -28,6 +28,15 @@
     <div class="centered">
       <button id="startbutton" onClick=start()>Start</button>
     </div>
+  </div>
+  <div id="notification" class="hidden">
+    <p id="message"></p>
+    <button id="close-button" onClick="closeNotification()">
+      Close
+    </button>
+    <button id="restart-button" onClick="restartApp()" class="hidden">
+      Restart
+    </button>
   </div>
 </body>
 
