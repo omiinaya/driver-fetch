@@ -30,7 +30,7 @@ function main() {
   //start the browser and create a browser instance
   let browserInstance = startBrowser();
 
-  let a = 'TUF GAMING B560M-E'
+  let a = 'ROG Zenith II Extreme Alpha'
   //testing mb brand
   let b = 'ASUS'
   //testing cpu brand

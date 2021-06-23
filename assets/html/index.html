@@ -9,7 +9,10 @@
 
 <body>
   <div class="content">
-    <div>
+    <div class="override">
+      <input type="checkbox" /><label>manual override</label>
+    </div>
+    <div class="centered">
       <select class="selectors" id="manufacturers">
         <option value="0">MSI</option>
         <option value="1">ASUS</option>
@@ -22,7 +25,9 @@
       </select>
       <input id="motherboard" placeholder="Motherboard name."></input>
     </div>
-    <button id="startbutton" onClick=start()>Start</button>
+    <div class="centered">
+      <button id="startbutton" onClick=start()>Start</button>
+    </div>
   </div>
 </body>
 
