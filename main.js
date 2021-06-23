@@ -47,9 +47,9 @@ function main() {
   //start the browser and create a browser instance
   let browserInstance = startBrowser();
 
-  let a = 'X570 AORUS XTREME'
+  let a = ''
   //testing mb brand
-  let b = 'AORUS'
+  let b = ''
   //testing cpu brand
   let c = ''
 
@@ -307,9 +307,8 @@ function parseAorus(a) {
       parts = mb.split(' ')
       parsed = parts.join('-') + '-rev-10'
     }
-    
   } else {
-    parsed = mb
+    parsed = mb + '-rev-10'
   }
   return parsed
 }
