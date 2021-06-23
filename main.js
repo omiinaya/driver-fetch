@@ -132,9 +132,13 @@ async function scrapeMSI(page, a, b, c) {
   );
   console.log(hrefs);
   selectDirectory().then((directory) => {
-    hrefs.forEach(url => {
-      dl(url, getFilePath(url, directory, a, b, c), a, b, c)
-    })
+    if (directory) {
+      hrefs.forEach(url => {
+        dl(url, getFilePath(url, directory, a, b, c), a, b, c)
+      })
+    } else {
+      return
+    }
   })
 }
 
@@ -144,9 +148,13 @@ async function scrapeASROCK(page, a, b, c) {
   );
   console.log(hrefs);
   selectDirectory().then((directory) => {
-    hrefs.forEach(url => {
-      dl(url, getFilePath(url, directory, a, b, c), a, b, c)
-    })
+    if (directory) {
+      hrefs.forEach(url => {
+        dl(url, getFilePath(url, directory, a, b, c), a, b, c)
+      })
+    } else {
+      return
+    }
   })
 }
 
@@ -156,9 +164,13 @@ async function scrapeAORUS(page, a, b, c) {
   );
   console.log(hrefs);
   selectDirectory().then((directory) => {
-    hrefs.forEach(url => {
-      dl(url, getFilePath(url, directory, a, b, c), a, b, c)
-    })
+    if (directory) {
+      hrefs.forEach(url => {
+        dl(url, getFilePath(url, directory, a, b, c), a, b, c)
+      })
+    } else {
+      return
+    }
   })
 }
 
@@ -171,9 +183,13 @@ async function scrapeASUS(page, a, b, c) {
   );
   console.log(hrefs);
   selectDirectory().then((directory) => {
-    hrefs.forEach(url => {
-      dl(url, getFilePath(url, directory, a, b, c), a, b, c)
-    })
+    if (directory) {
+      hrefs.forEach(url => {
+        dl(url, getFilePath(url, directory, a, b, c), a, b, c)
+      })
+    } else {
+      return
+    }
   })
 }
 
@@ -404,7 +420,9 @@ async function selectDirectory() {
   }
   //opening dialog and executing a function
   const result = await dialog.showOpenDialog(window, options)
-  return result.filePaths[0]
+  if (result) {
+    return result.filePaths[0]
+  }
 }
 
 
