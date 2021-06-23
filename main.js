@@ -47,9 +47,9 @@ function main() {
   //start the browser and create a browser instance
   let browserInstance = startBrowser();
 
-  let a = ''
+  let a = 'X570 AORUS XTREME'
   //testing mb brand
-  let b = ''
+  let b = 'AORUS'
   //testing cpu brand
   let c = ''
 
@@ -296,12 +296,18 @@ function parseAorus(a) {
   }
   if (mb.lastIndexOf(' ') != -1) {
     var parsed;
-    var parts = mb
-      .replaceAll('(', '')
-      .replaceAll(')', '')
-      .replaceAll('.', '')
-      .split(' ')
-    parsed = parts.join('-')
+    if (mb.includes('rev')) {
+      var parts = mb
+        .replaceAll('(', '')
+        .replaceAll(')', '')
+        .replaceAll('.', '')
+        .split(' ')
+        parsed = parts.join('-')
+    } else {
+      parts = mb.split(' ')
+      parsed = parts.join('-') + '-rev-10'
+    }
+    
   } else {
     parsed = mb
   }
