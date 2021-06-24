@@ -24,7 +24,7 @@ function start() {
     var b = manufacturers.value
     var c = processors.value
     ipc.send('MANUAL_REQUEST', [a, b, c])
-    ipc.send("TESTING_1")
+    ipc.send("START_REQUEST")
   }
 }
 
@@ -39,6 +39,8 @@ function handleCheckbox() {
       motherboard.disabled = true;
       manufacturers.disabled = true;
       processors.disabled = true;
+      motherboard.value = ''
+      ipc.send('RESET_REQUEST')
     }
   });
 }

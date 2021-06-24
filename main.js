@@ -33,13 +33,13 @@ const createWindow = () => {
 
 };
 
-let a, b, c;
+let a, b, c, browser;
 
 app.on('ready', function () {
   createWindow()
 });
 
-ipc.on('TESTING_1', function () {
+ipc.on('START_REQUEST', function () {
   main(a, b, c)
 })
 
@@ -51,6 +51,10 @@ ipc.on('DEFAULT_REQUEST', function () {
 ipc.on('MANUAL_REQUEST', function (evt, data) {
   setVars(data[0], data[1], data[2])
   window.webContents.send('HTML_RESPONSE', [data[0], data[1], data[2]]);
+})
+
+ipc.on('RESET_REQUEST', function (evt, data) {
+  setVars()
 })
 
 function setVars(x, y, z) {
@@ -88,7 +92,6 @@ function main(a, b, c) {
 }
 
 async function startBrowser() {
-  let browser;
   try {
     print("Opening the browser......");
     browser = await puppeteer.launch({
@@ -396,7 +399,6 @@ async function ifNotExistCreateDir(url, directory) {
 }
 
 function dl(url, directory, a, b, c) {
-
   print('url: ' + url)
   print('dir: ' + directory)
   ifNotExistCreateDir(url, directory)
@@ -406,7 +408,9 @@ function dl(url, directory, a, b, c) {
       //
     })
     .on('error', err => console.log(err))
-    .on('end', () => { })
+    .on('end', () => { 
+      browser.close()
+    })
     .pipe(createWriteStream(directory))
 }
 
@@ -418,8 +422,11 @@ async function selectDirectory() {
   }
   //opening dialog and executing a function
   const result = await dialog.showOpenDialog(window, options)
-  if (result) {
+  if (result.filePaths.length > 0) {
+    console.log(result)
     return result.filePaths[0]
+  } else {
+    browser.close()
   }
 }
 
