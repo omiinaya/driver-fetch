@@ -29,36 +29,41 @@ const createWindow = () => {
   });
   mainWindow.loadFile(path.join(__dirname, './assets/html/index.html'));
 
-  mainWindow.once('ready-to-show', () => {
-    autoUpdater.checkForUpdatesAndNotify();
-  });
-
-  autoUpdater.on('update-available', () => {
-    mainWindow.webContents.send('update_available');
-  });
-
-  autoUpdater.on('update-downloaded', () => {
-    mainWindow.webContents.send('update_downloaded');
-  });
-
   window = mainWindow;
+
 };
 
-app.on('ready', createWindow);
+let a, b, c;
+
+app.on('ready', function() {
+  createWindow()
+});
 
 ipc.on('TESTING_1', function () {
-  main()
+  main(a, b, c)
 })
 
-function main() {
+ipc.on('DEFAULT_REQUEST', function () {
+  setVars()
+  if (!a) {
+    window.webContents.send('DEFAULT_RESPONSE', [getMBInfo(), getManufacturer(), getCPUInfo()]);
+  } else {
+    window.webContents.send('DEFAULT_RESPONSE', [a, b, c]);
+  }
+})
+
+function setVars() {
+  //testing mb name
+  a = ''
+  //testing mb brand
+  b = ''
+  //testing cpu brand
+  c = ''
+}
+
+function main(a, b, c) {
   //start the browser and create a browser instance
   let browserInstance = startBrowser();
-
-  let a = ''
-  //testing mb brand
-  let b = ''
-  //testing cpu brand
-  let c = ''
 
   let brand = getManufacturer(b);
   //testing mb name
@@ -394,7 +399,7 @@ function dl(url, directory, a, b, c) {
 
   progress(request(url))
     .on('progress', state => {
-      window.webContents.send('DOWNLOAD_STATUS', [state, directory]);
+      //
     })
     .on('error', err => console.log(err))
     .on('end', () => { })
@@ -440,15 +445,3 @@ function print(a) {
 //X570S AERO G (rev. 1.0)
 
 //wmic startup
-
-
-
-ipc.on('restart_app', () => {
-  autoUpdater.quitAndInstall();
-});
-
-ipc.on('RESIZE_REQUEST', (evt, data) => {
-  var width = data[0]
-  var height = data[1]
-  window.setSize(width, height)
-});

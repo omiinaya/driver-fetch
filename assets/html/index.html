@@ -16,14 +16,14 @@
     </div>
     <div class="centered">
       <select class="selectors" id="manufacturers">
-        <option value="0">MSI</option>
-        <option value="1">ASUS</option>
-        <option value="2">AORUS</option>
-        <option value="3">ASROCK</option>
+        <option value="MSI">MSI</option>
+        <option value="ASUS">ASUS</option>
+        <option value="AORUS">AORUS</option>
+        <option value="ASROCK">ASROCK</option>
       </select>
       <select class="selectors" id="processors">
-        <option value="0">Intel</option>
-        <option value="1">AMD</option>
+        <option value="Intel">Intel</option>
+        <option value="AMD">AMD</option>
       </select>
       <input id="motherboard" placeholder="Motherboard name."></input>
     </div>
@@ -31,15 +31,6 @@
     <div class="centered">
       <button id="startbutton" onClick=start()>Start</button>
     </div>
-  </div>
-  <div id="notification" class="hidden">
-    <p id="message"></p>
-    <button id="close-button" onClick="closeNotification()">
-      Close
-    </button>
-    <button id="restart-button" onClick="restartApp()" class="hidden">
-      Restart
-    </button>
   </div>
 </body>
 
