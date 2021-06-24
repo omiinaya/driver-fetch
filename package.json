@@ -23,6 +23,11 @@
     "electron-reload": "^1.5.0",
     "electron-updater": "^4.3.9",
     "puppeteer": "^10.0.0",
+    "puppeteer-extra": "^3.1.18",
+    "puppeteer-extra-plugin-adblocker": "^2.11.11",
+    "puppeteer-extra-plugin-stealth": "^2.7.8",
+    "request": "^2.88.2",
+    "request-progress": "^3.0.0",
     "v8-compile-cache": "^2.3.0"
   }
 }

@@ -7,7 +7,7 @@
   <script defer src="../../renderer.js"></script>
 </head>
 
-<body>
+<body id="body">
   <div class="content">
     <div class="centered">
       <input type="checkbox" /><label>manual override</label>
@@ -25,8 +25,12 @@
       </select>
       <input id="motherboard" placeholder="Motherboard name."></input>
     </div>
+    <div id="downloads"></div>
     <div class="centered">
       <button id="startbutton" onClick=start()>Start</button>
+    </div>
+    <div class="centered">
+      <button id="testbutton" onClick=test()>test</button>
     </div>
   </div>
   <div id="notification" class="hidden">

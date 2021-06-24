@@ -1,13 +1,20 @@
-require('electron-reload')(__dirname, { ignored: /db|[\/\\]\./, argv: [] });
-const delay = ms => new Promise(res => setTimeout(res, ms));
-const { app, BrowserWindow, dialog } = require('electron');
+require('electron-reload')(__dirname, { ignored: /db|[\/\\]\./, argv: [] })
+const delay = ms => new Promise(res => setTimeout(res, ms))
+const { app, BrowserWindow, dialog } = require('electron')
 const { execSync } = require('child_process')
 const ipc = require('electron').ipcMain
-const puppeteer = require('puppeteer');
-const path = require('path');
-const https = require('https')
-const { autoUpdater } = require('electron-updater');
-const fs = require("fs");
+const puppeteer = require('puppeteer-extra')
+const path = require('path')
+const { autoUpdater } = require('electron-updater')
+const { createWriteStream } = require("fs")
+const request = require('request')
+const progress = require('request-progress')
+
+const StealthPlugin = require('puppeteer-extra-plugin-stealth');
+puppeteer.use(StealthPlugin());
+
+const AdblockerPlugin = require('puppeteer-extra-plugin-adblocker')
+puppeteer.use(AdblockerPlugin({ blockTrackers: true }))
 
 let window;
 
@@ -302,7 +309,7 @@ function parseAorus(a) {
         .replaceAll(')', '')
         .replaceAll('.', '')
         .split(' ')
-        parsed = parts.join('-')
+      parsed = parts.join('-')
     } else {
       parts = mb.split(' ')
       parsed = parts.join('-') + '-rev-10'
@@ -380,38 +387,25 @@ async function ifNotExistCreateDir(url, directory) {
 }
 
 function dl(url, directory, a, b, c) {
-  print(url)
-  print(directory)
+  
+  print('url: ' + url)
+  print('dir: ' + directory)
   ifNotExistCreateDir(url, directory)
-  var file = fs.createWriteStream(directory);
-  https.get(url, function (response) {
-    response.pipe(file);
-  });
-  /*
-  if (!a) {
-    var mb = getMBInfo()
-    var dir = __dirname + "\\drivers\\" + mb + "\\"
-    var directory = parseDash(dir)
-    var path = directory + "\\" + filename
-    ifNotExistCreateDir(directory, filename)
+  
+  progress(request(url))
+    .on('progress', state => {
+      window.webContents.send('DOWNLOAD_STATUS', state);
+      //create a div based on total, then edit it if the total matches div id
+    })
+    .on('error', err => console.log(err))
+    .on('end', () => { })
+    .pipe(createWriteStream(directory))
 
-    var file = fs.createWriteStream(path);
-    https.get(url, function (response) {
-      response.pipe(file);
-    });
-  } else {
-    var mb = getMBInfo(a)
-    var dir = __dirname + "\\drivers\\" + mb + "\\"
-    var directory = parseDash(dir)
-    var path = directory + "\\" + filename
-    ifNotExistCreateDir(directory, filename)
+  //var file = createWriteStream(directory);
+  //https.get(url, function (response) {
+  //  response.pipe(file);
+  //});
 
-    var file = fs.createWriteStream(path);
-    https.get(url, function (response) {
-      response.pipe(file);
-    });
-  }
-  */
 }
 
 async function selectDirectory() {
@@ -458,4 +452,11 @@ function print(a) {
 
 ipc.on('restart_app', () => {
   autoUpdater.quitAndInstall();
+});
+
+ipc.on('RESIZE_REQUEST', (evt, data) => {
+  var width = parseInt(data[0])
+  var height = parseInt(data[1])
+  console.log(data)
+  window.setSize(width, height)
 });
