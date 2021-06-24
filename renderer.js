@@ -9,7 +9,7 @@ var bars = [];
 
 //on DOM load
 document.addEventListener("DOMContentLoaded", function (event) {
-  console.log(width + " : " + height)
+  //
 });
 
 function start() {
@@ -65,9 +65,8 @@ ipc.on('DOWNLOAD_STATUS', (evt, data) => {
     createDivs(data)
     resizeWindow()
   } else {
-    bars.forEach(bar => {
-      bar.animate(1)
-    })
+    var x = bars.filter(bar => bar._container.id == 'bar-' + data[0].size.total)
+    x[0].animate(data[0].percent)
   }
 });
 
