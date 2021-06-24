@@ -35,7 +35,7 @@ const createWindow = () => {
 
 let a, b, c;
 
-app.on('ready', function() {
+app.on('ready', function () {
   createWindow()
 });
 
@@ -45,20 +45,24 @@ ipc.on('TESTING_1', function () {
 
 ipc.on('DEFAULT_REQUEST', function () {
   setVars()
-  if (!a) {
-    window.webContents.send('DEFAULT_RESPONSE', [getMBInfo(), getManufacturer(), getCPUInfo()]);
-  } else {
-    window.webContents.send('DEFAULT_RESPONSE', [a, b, c]);
-  }
+  window.webContents.send('HTML_RESPONSE', [getMBInfo(), getManufacturer(), getCPUInfo()]);
 })
 
-function setVars() {
-  //testing mb name
-  a = ''
-  //testing mb brand
-  b = ''
-  //testing cpu brand
-  c = ''
+ipc.on('MANUAL_REQUEST', function (evt, data) {
+  setVars(data[0], data[1], data[2])
+  window.webContents.send('HTML_RESPONSE', [data[0], data[1], data[2]]);
+})
+
+function setVars(x, y, z) {
+  if (!x) {
+    a = '' //testing mb name
+    b = '' //testing mb brand
+    c = '' //testing cpu brand
+  } else {
+    a = x
+    b = y
+    c = z
+  }
 }
 
 function main(a, b, c) {
