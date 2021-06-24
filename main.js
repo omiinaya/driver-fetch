@@ -387,25 +387,18 @@ async function ifNotExistCreateDir(url, directory) {
 }
 
 function dl(url, directory, a, b, c) {
-  
+
   print('url: ' + url)
   print('dir: ' + directory)
   ifNotExistCreateDir(url, directory)
-  
+
   progress(request(url))
     .on('progress', state => {
-      window.webContents.send('DOWNLOAD_STATUS', state);
-      //create a div based on total, then edit it if the total matches div id
+      window.webContents.send('DOWNLOAD_STATUS', [state, directory]);
     })
     .on('error', err => console.log(err))
     .on('end', () => { })
     .pipe(createWriteStream(directory))
-
-  //var file = createWriteStream(directory);
-  //https.get(url, function (response) {
-  //  response.pipe(file);
-  //});
-
 }
 
 async function selectDirectory() {
@@ -455,8 +448,7 @@ ipc.on('restart_app', () => {
 });
 
 ipc.on('RESIZE_REQUEST', (evt, data) => {
-  var width = parseInt(data[0])
-  var height = parseInt(data[1])
-  console.log(data)
+  var width = data[0]
+  var height = data[1]
   window.setSize(width, height)
 });
