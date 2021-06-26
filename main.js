@@ -433,11 +433,6 @@ function print(a) {
   window.webContents.send('LOG_REQUEST', a);
 }
 
-
-//disable onedrive starting up
-//initialize drives
-//partition drives if needed
-
 //tested: 
 //MPG-Z590-GAMING-CARBON-WIFI
 //MEG-Z590-UNIFY
@@ -454,8 +449,6 @@ function print(a) {
 //Z590 GAMING X (rev. 1.0)
 //X570S AERO G (rev. 1.0)
 
-//wmic startup
-
 function scrapeMDB() {
   //get all h4s for mb names
   //find disabled link-page then + 1 to find the last page
@@ -465,7 +458,7 @@ function scrapeMDB() {
 }
 
 function sendStatus(text) {
-  print.info(text);
+  print(text);
   if (window) {
     window.webContents.send('message', text);
   }
@@ -477,34 +470,30 @@ autoUpdater.on('checking-for-update', () => {
 
 autoUpdater.on('update-available', (ev, info) => {
   sendStatus('Update available.');
-  print.info('info', info);
-  print.info('arguments', arguments);
+  print(info);
 })
 
 autoUpdater.on('update-not-available', (ev, info) => {
   sendStatus('Update not available.');
-  print.info('info', info);
-  print.info('arguments', arguments);
+  print(info);
 })
 
 autoUpdater.on('error', (ev, err) => {
   sendStatus('Error in auto-updater.');
-  print.info('err', err);
-  print.info('arguments', arguments);
+  print(err);
 })
 
 autoUpdater.on('update-downloaded', (ev, info) => {
   sendStatus('Update downloaded.  Will quit and install in 5 seconds.');
-  print.info('info', info);
-  print.info('arguments', arguments);
-  // Wait 5 seconds, then quit and install
-  // setTimeout(function() {
-  //   autoUpdater.quitAndInstall();  
-  // }, 5000)
+  print(info);
+  //print(arguments);
+  //Wait 5 seconds, then quit and install
+  //setTimeout(function() {
+    //autoUpdater.quitAndInstall();  
+  //}, 5000)
 })
-// Wait a second for the window to exist before checking for updates.
-//autoUpdater.setFeedURL('http://127.0.0.1:8080/');
+
 setTimeout(function() {
-  print.info('starting update check');
+  print('starting update check');
   autoUpdater.checkForUpdates()  
 }, 1000);
