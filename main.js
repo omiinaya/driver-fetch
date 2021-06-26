@@ -1,11 +1,10 @@
 require('electron-reload')(__dirname, { ignored: /db|[\/\\]\./, argv: [] })
 const delay = ms => new Promise(res => setTimeout(res, ms))
-const { app, BrowserWindow, dialog } = require('electron')
+const { app, BrowserWindow, dialog, autoUpdater } = require('electron')
 const { execSync } = require('child_process')
 const ipc = require('electron').ipcMain
 const puppeteer = require('puppeteer-extra')
 const path = require('path')
-const { autoUpdater } = require('electron-updater')
 const { createWriteStream } = require("fs")
 const request = require('request')
 const progress = require('request-progress')
@@ -53,7 +52,7 @@ ipc.on('MANUAL_REQUEST', function (evt, data) {
   window.webContents.send('HTML_RESPONSE', [data[0], data[1], data[2]]);
 })
 
-ipc.on('RESET_REQUEST', function (evt, data) {
+ipc.on('RESET_REQUEST', function () {
   setVars()
 })
 
@@ -408,7 +407,7 @@ function dl(url, directory, a, b, c) {
       //
     })
     .on('error', err => console.log(err))
-    .on('end', () => { 
+    .on('end', () => {
       browser.close()
     })
     .pipe(createWriteStream(directory))
@@ -464,3 +463,48 @@ function scrapeMDB() {
   //send motherboard to database on each iteration
   //profit
 }
+
+function sendStatus(text) {
+  print.info(text);
+  if (window) {
+    window.webContents.send('message', text);
+  }
+}
+
+autoUpdater.on('checking-for-update', () => {
+  sendStatus('Checking for update...');
+})
+
+autoUpdater.on('update-available', (ev, info) => {
+  sendStatus('Update available.');
+  print.info('info', info);
+  print.info('arguments', arguments);
+})
+
+autoUpdater.on('update-not-available', (ev, info) => {
+  sendStatus('Update not available.');
+  print.info('info', info);
+  print.info('arguments', arguments);
+})
+
+autoUpdater.on('error', (ev, err) => {
+  sendStatus('Error in auto-updater.');
+  print.info('err', err);
+  print.info('arguments', arguments);
+})
+
+autoUpdater.on('update-downloaded', (ev, info) => {
+  sendStatus('Update downloaded.  Will quit and install in 5 seconds.');
+  print.info('info', info);
+  print.info('arguments', arguments);
+  // Wait 5 seconds, then quit and install
+  // setTimeout(function() {
+  //   autoUpdater.quitAndInstall();  
+  // }, 5000)
+})
+// Wait a second for the window to exist before checking for updates.
+//autoUpdater.setFeedURL('http://127.0.0.1:8080/');
+setTimeout(function() {
+  print.info('starting update check');
+  autoUpdater.checkForUpdates()  
+}, 1000);
