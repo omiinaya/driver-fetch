@@ -109,7 +109,7 @@ async function scraper(browser, url, brand, a, b, c) {
   const [page] = await browser.pages()
   await page.setRequestInterception(true)
   page.on('request', request => {
-    if (request.resourceType() === 'image' || request.resourceType() === 'stylesheet')
+    if (request.resourceType() === 'image' /*|| request.resourceType() === 'stylesheet'*/)
       request.abort();
     else
       request.continue();
@@ -160,7 +160,7 @@ async function scrapeMSI(page, a, b, c) {
 
 async function scrapeASROCK(page, a, b, c) {
   const hrefs = await page.$$eval('a', as => as.map(a => a.href)
-    .filter(href => href.includes('https://download.asrock.com/Drivers/'))
+    .filter(href => href.includes('asrock.com/Drivers/'))
   );
   print(hrefs);
   selectDirectory().then((directory) => {
@@ -176,7 +176,7 @@ async function scrapeASROCK(page, a, b, c) {
 
 async function scrapeAORUS(page, a, b, c) {
   const hrefs = await page.$$eval('a', as => as.map(a => a.href)
-    .filter(href => href.includes('https://download.gigabyte.com/FileList/Driver/'))
+    .filter(href => href.includes('gigabyte.com/FileList/Driver/'))
   );
   print(hrefs);
   selectDirectory().then((directory) => {
@@ -193,9 +193,9 @@ async function scrapeAORUS(page, a, b, c) {
 async function scrapeASUS(page, a, b, c) {
   const selectElem = await page.$('select[class^="ProductSupportDriverBIOS__select__"]');
   await selectElem.type('Windows 10 64-bit');
-  await delay(2000)
+  await delay(3000)
   const hrefs = await page.$$eval('a', as => as.map(a => a.href)
-    .filter(href => href.includes('https://dlcdnets.asus.com/pub/'))
+    .filter(href => href.includes('dlcdnets.asus.com/pub'))
   );
   print(hrefs);
   selectDirectory().then((directory) => {
@@ -286,12 +286,12 @@ function parseDash(a) {
     mb = getMBInfo(a)
   }
   if (mb.lastIndexOf(' ') != -1) {
-    var parsed;
+    var parsed, url;
     var parts = mb.split(' ')
-    parsed = parts.join('-')
-    parsed.replaceAll('/', '')
+    url = parts.join('-')
+    parsed = url.replaceAll('/', '').replaceAll('(', '').replaceAll(')', '')
   } else {
-    parsed = mb.replaceAll('/', '')
+    parsed = mb.replaceAll('/', '').replaceAll('(', '').replaceAll(')', '')
   }
   return parsed
 }
@@ -456,3 +456,11 @@ function print(a) {
 //X570S AERO G (rev. 1.0)
 
 //wmic startup
+
+function scrapeMDB() {
+  //get all h4s for mb names
+  //find disabled link-page then + 1 to find the last page
+  //iterate through every page
+  //send motherboard to database on each iteration
+  //profit
+}
