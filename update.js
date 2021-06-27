@@ -1,4 +1,8 @@
 const puppeteer = require('puppeteer-extra')
+const progress = require('request-progress')
+const { execSync } = require('child_process')
+const { createWriteStream } = require("fs")
+const request = require('request')
 
 const StealthPlugin = require('puppeteer-extra-plugin-stealth');
 puppeteer.use(StealthPlugin());
@@ -47,25 +51,57 @@ async function scraper(browser, url) {
             request.continue();
     })
     console.log(`Navigating to ` + url + `...`);
-    await page.goto(url/*, {
-        waitUntil: "networkidle2"
-    }*/);
+    await page.goto(url);
 
     scrapeReleases(page)
 }
 
 async function scrapeReleases(page) {
     const hrefs = await page.$$eval('a', as => as.map(a => a.href)
-        .filter(href => href.includes('driver-fetch'))
+        .filter(href => (href.includes('driver-fetch-v') && href.includes('.zip')))
     );
     console.log(hrefs);
+
+    var directory = __dirname
+    hrefs.forEach(url => {
+        dl(url, getFilePath(url, directory))
+    })
+
 }
 
-function test() {
-    console.log('test')
+async function ifNotExistCreateDir(url, directory) {
+    var name = url.substring(url.lastIndexOf('/') + 1, url.length)
+    var path = directory.replace(name, '')
+    console.log(path)
+    try {
+        return execSync('dir ' + path).toString().trim()
+    } catch (error) {
+        var condition = error.stderr.toString()
+        if (condition.includes('cannot find')) {
+            return execSync('mkdir ' + path).toString().trim()
+        }
+    }
+}
+
+function getFilePath(url, directory) {
+    var name = url.substring(url.lastIndexOf('/') + 1, url.length)
+    var path = directory + '\\test\\' + name
+    return path
+}
+
+function dl(url, directory) {
+    ifNotExistCreateDir(url, directory)
+
+    progress(request(url))
+        .on('progress', state => { })
+        .on('error', err => console.log(err))
+        .on('end', () => {
+            browser.close()
+        })
+        .pipe(createWriteStream(directory))
 }
 
 module.exports = {
     check,
-    test
+    dl
 }

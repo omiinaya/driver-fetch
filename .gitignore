@@ -11,6 +11,7 @@ jspm_packages/
 drivers/
 dist/
 driver-fetch-win32-x64/
+test/
 
 # dotenv environment variables file
 .env

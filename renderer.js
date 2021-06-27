@@ -1,16 +1,14 @@
 const electron = require('electron')
 const ipc = electron.ipcRenderer
+var x = require("electron").remote.getCurrentWindow()
 
-var motherboard;
-var manufacturers;
-var processors;
+var motherboard, manufacturers, processors
 
 //on DOM load
 document.addEventListener("DOMContentLoaded", function (event) {
   motherboard = document.getElementById('motherboard')
   manufacturers = document.getElementById('manufacturers')
   processors = document.getElementById('processors')
-
 
   handleCheckbox()
   ipc.send('DEFAULT_REQUEST')
@@ -24,6 +22,10 @@ function start() {
     ipc.send('MANUAL_REQUEST', [a, b, c])
     ipc.send("START_REQUEST")
   }
+}
+
+function update() {
+  ipc.send("UPDATE_REQUEST")
 }
 
 function handleCheckbox() {

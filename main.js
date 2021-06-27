@@ -1,6 +1,6 @@
 require('electron-reload')(__dirname, { ignored: /db|[\/\\]\./, argv: [] })
 const delay = ms => new Promise(res => setTimeout(res, ms))
-const { app, BrowserWindow, dialog, autoUpdater } = require('electron')
+const { app, BrowserWindow, dialog } = require('electron')
 const { execSync } = require('child_process')
 const ipc = require('electron').ipcMain
 const puppeteer = require('puppeteer-extra')
@@ -24,13 +24,13 @@ const createWindow = () => {
     height: 200,
     webPreferences: {
       nodeIntegration: true,
-      enableRemoteModule: true
+      enableRemoteModule: true,
+      preload: path.join(__dirname, 'update.js')
     }
   });
   mainWindow.loadFile(path.join(__dirname, './assets/html/index.html'));
 
   window = mainWindow;
-
 };
 
 let a, b, c, browser;
@@ -41,7 +41,10 @@ app.on('ready', function () {
 
 ipc.on('START_REQUEST', function () {
   main(a, b, c)
-  //update.check('https://github.com/omiinaya/driver-fetch/releases')
+})
+
+ipc.on('UPDATE_REQUEST', function () {
+  update.check('https://github.com/omiinaya/driver-fetch/releases')
 })
 
 ipc.on('DEFAULT_REQUEST', function () {
