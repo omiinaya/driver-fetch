@@ -3,7 +3,8 @@
 
 <head>
   <title>Electron</title>
-  <link rel="stylesheet" href="../../assets/dependencies/css/bootstrap.min.css"></script>
+  <link rel="stylesheet" href="../../assets/dependencies/css/bootstrap.min.css">
+  </script>
   <link rel="stylesheet" href="../css/index.css" />
   <script src="../../assets/dependencies/js/bootstrap.min.js"></script>
   <script src="../../renderer.js"></script>
@@ -12,24 +13,27 @@
 <body id="body">
   <div class="content">
     <div class="centered">
-      <input type="checkbox" name="checkbox"/><label>manual override</label>
+      <input type="checkbox" name="checkbox" /><label>Manual Override</label>
     </div>
     <div class="centered">
-      <select class="selectors" id="manufacturers" disabled = "true">
+      <select class="selectors" id="manufacturers" disabled="true">
         <option value="MSI">MSI</option>
         <option value="ASUS">ASUS</option>
         <option value="AORUS">AORUS</option>
         <option value="ASROCK">ASROCK</option>
       </select>
-      <select class="selectors" id="processors" disabled = "true">
+      <select class="selectors" id="processors" disabled="true">
         <option value="Intel">Intel</option>
         <option value="AMD">AMD</option>
       </select>
-      <input id="motherboard" placeholder="Motherboard" disabled = "true"></input>
+      <input id="motherboard" placeholder="Motherboard" disabled="true"></input>
     </div>
     <div id="downloads"></div>
     <div class="centered">
       <button id="startbutton" onClick=start()>Start</button>
+    </div>
+    <div class="centered">
+      <a href='#'>Check for updates</a>
     </div>
   </div>
 </body>

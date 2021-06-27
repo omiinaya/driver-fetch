@@ -17,9 +17,7 @@ document.addEventListener("DOMContentLoaded", function (event) {
 });
 
 function start() {
-  if (!motherboard.value) {
-    ipc.send("TESTING_1")
-  } else {
+  if (motherboard.value) {
     var a = motherboard.value
     var b = manufacturers.value
     var c = processors.value
@@ -39,8 +37,7 @@ function handleCheckbox() {
       motherboard.disabled = true;
       manufacturers.disabled = true;
       processors.disabled = true;
-      motherboard.value = ''
-      ipc.send('RESET_REQUEST')
+      ipc.send("DEFAULT_REQUEST")
     }
   });
 }

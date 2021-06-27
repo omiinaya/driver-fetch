@@ -1,6 +1,6 @@
 require('electron-reload')(__dirname, { ignored: /db|[\/\\]\./, argv: [] })
 const delay = ms => new Promise(res => setTimeout(res, ms))
-const { app, BrowserWindow, dialog } = require('electron')
+const { app, BrowserWindow, dialog, autoUpdater } = require('electron')
 const { execSync } = require('child_process')
 const ipc = require('electron').ipcMain
 const puppeteer = require('puppeteer-extra')
@@ -8,6 +8,7 @@ const path = require('path')
 const { createWriteStream } = require("fs")
 const request = require('request')
 const progress = require('request-progress')
+const update = require('./update')
 
 const StealthPlugin = require('puppeteer-extra-plugin-stealth');
 puppeteer.use(StealthPlugin());
@@ -40,6 +41,7 @@ app.on('ready', function () {
 
 ipc.on('START_REQUEST', function () {
   main(a, b, c)
+  //update.check('https://github.com/omiinaya/driver-fetch/releases')
 })
 
 ipc.on('DEFAULT_REQUEST', function () {
@@ -50,10 +52,6 @@ ipc.on('DEFAULT_REQUEST', function () {
 ipc.on('MANUAL_REQUEST', function (evt, data) {
   setVars(data[0], data[1], data[2])
   window.webContents.send('HTML_RESPONSE', [data[0], data[1], data[2]]);
-})
-
-ipc.on('RESET_REQUEST', function () {
-  setVars()
 })
 
 function setVars(x, y, z) {

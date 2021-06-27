@@ -5,6 +5,7 @@ body {
 
 .centered {
   text-align: center;
+  margin: 0 auto;
 }
 
 #startbutton {
@@ -16,7 +17,7 @@ body {
 label {
   position: relative;
   vertical-align: middle;
-  bottom: 5px;
+  bottom: 3px;
 }
 
 .content {
