@@ -1,14 +1,16 @@
 {
   "name": "driver-fetch",
-  "version": "0.0.5",
+  "version": "0.0.1",
   "description": "A minimal electron application made to facilitate acquiring drivers.",
   "main": "main.js",
   "scripts": {
     "server": "node server.js",
     "client": "electron .",
     "start": "electron .",
+    "dist": "electron-builder --x64",
     "build": "electron-packager . driver-fetch --overwrite --platform=win32",
-    "rebuild": "electron-rebuild -f -w main.js"
+    "rebuild": "electron-rebuild -f -w main.js",
+    "publish": "electron-builder --x64 -p always"
   },
   "repository": "https://github.com/omiinaya/driver-fetch",
   "author": "Omar Minaya",

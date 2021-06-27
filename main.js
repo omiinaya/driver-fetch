@@ -1,6 +1,6 @@
 require('electron-reload')(__dirname, { ignored: /db|[\/\\]\./, argv: [] })
 const delay = ms => new Promise(res => setTimeout(res, ms))
-const { app, BrowserWindow, dialog, autoUpdater } = require('electron')
+const { app, BrowserWindow, dialog } = require('electron')
 const { execSync } = require('child_process')
 const ipc = require('electron').ipcMain
 const puppeteer = require('puppeteer-extra')
@@ -456,44 +456,3 @@ function scrapeMDB() {
   //send motherboard to database on each iteration
   //profit
 }
-
-function sendStatus(text) {
-  print(text);
-  if (window) {
-    window.webContents.send('message', text);
-  }
-}
-
-autoUpdater.on('checking-for-update', () => {
-  sendStatus('Checking for update...');
-})
-
-autoUpdater.on('update-available', (ev, info) => {
-  sendStatus('Update available.');
-  print(info);
-})
-
-autoUpdater.on('update-not-available', (ev, info) => {
-  sendStatus('Update not available.');
-  print(info);
-})
-
-autoUpdater.on('error', (ev, err) => {
-  sendStatus('Error in auto-updater.');
-  print(err);
-})
-
-autoUpdater.on('update-downloaded', (ev, info) => {
-  sendStatus('Update downloaded.  Will quit and install in 5 seconds.');
-  print(info);
-  //print(arguments);
-  //Wait 5 seconds, then quit and install
-  //setTimeout(function() {
-    //autoUpdater.quitAndInstall();  
-  //}, 5000)
-})
-
-setTimeout(function() {
-  print('starting update check');
-  autoUpdater.checkForUpdates()  
-}, 1000);
