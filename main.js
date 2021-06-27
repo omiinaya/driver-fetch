@@ -5,10 +5,11 @@ const { execSync } = require('child_process')
 const ipc = require('electron').ipcMain
 const puppeteer = require('puppeteer-extra')
 const path = require('path')
-const { createWriteStream } = require("fs")
+const { createWriteStream, createReadStream } = require("fs")
 const request = require('request')
 const progress = require('request-progress')
 const update = require('./update')
+const unzipper = require('unzipper')
 
 const StealthPlugin = require('puppeteer-extra-plugin-stealth');
 puppeteer.use(StealthPlugin());
@@ -21,7 +22,7 @@ let window;
 const createWindow = () => {
   const mainWindow = new BrowserWindow({
     width: 400,
-    height: 200,
+    height: 250,
     webPreferences: {
       nodeIntegration: true,
       enableRemoteModule: true,
@@ -41,6 +42,7 @@ app.on('ready', function () {
 
 ipc.on('START_REQUEST', function () {
   main(a, b, c)
+  window.webContents.send('STATUS_FETCHING');
 })
 
 ipc.on('UPDATE_REQUEST', function () {
@@ -399,10 +401,8 @@ async function ifNotExistCreateDir(url, directory) {
 }
 
 function dl(url, directory, a, b, c) {
-  print('url: ' + url)
-  print('dir: ' + directory)
+  window.webContents.send('STATUS_DOWNLOADING');
   ifNotExistCreateDir(url, directory)
-
   progress(request(url))
     .on('progress', state => {
       //
@@ -410,8 +410,21 @@ function dl(url, directory, a, b, c) {
     .on('error', err => console.log(err))
     .on('end', () => {
       browser.close()
+      unzip(directory, url)
     })
     .pipe(createWriteStream(directory))
+}
+
+function unzip(directory, url) {
+  window.webContents.send('STATUS_EXTRACTING')
+  var name = url.substring(url.lastIndexOf('/') + 1, url.length)
+  var path = directory.replace(name, '')
+  createReadStream(directory)
+  .pipe(unzipper.Extract({ path: path })
+  .on('finish', () => {
+    console.log('test')
+  })
+  )
 }
 
 async function selectDirectory() {

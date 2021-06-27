@@ -1,8 +1,7 @@
 const electron = require('electron')
 const ipc = electron.ipcRenderer
-var x = require("electron").remote.getCurrentWindow()
 
-var motherboard, manufacturers, processors
+var motherboard, manufacturers, processors, status
 
 //on DOM load
 document.addEventListener("DOMContentLoaded", function (event) {
@@ -62,4 +61,24 @@ ipc.on('HTML_RESPONSE', (evt, data) => {
   var manufacturer = data[1]
   var cpu = data[2]
   setHTML(motherboard, manufacturer, cpu)
+})
+
+ipc.on('STATUS_FETCHING', () => {
+  var status = document.getElementById('status')
+  status.innerHTML = "<div>Fetching Drivers...</div>"
+})
+
+ipc.on('STATUS_DOWNLOADING', () => {
+  var status = document.getElementById('status')
+  status.innerHTML = "<div>Downloading Drivers...</div>"
+})
+
+ipc.on('STATUS_EXTRACTING', (evt, data) => {
+  var status = document.getElementById('status')
+  status.innerHTML = "<div>Extracting Drivers...</div>"
+})
+
+ipc.on('STATUS_DONE', (evt, data) => {
+  var status = document.getElementById('status')
+  status.innerHTML = "<div>Done.</div>"
 })
