@@ -29,6 +29,7 @@
     "puppeteer-extra-plugin-stealth": "^2.7.8",
     "request": "^2.88.2",
     "request-progress": "^3.0.0",
+    "unzipper": "^0.10.11",
     "v8-compile-cache": "^2.3.0"
   }
 }
