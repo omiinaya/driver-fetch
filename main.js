@@ -387,6 +387,7 @@ function getFilePath(url, directory, a, b, c) {
 async function ifNotExistCreateDir(url, directory) {
   var name = url.substring(url.lastIndexOf('/') + 1, url.length)
   var path = directory.replace(name, '')
+  print(name)
   print(path)
   try {
     return execSync('dir ' + path).toString().trim()
@@ -395,14 +396,13 @@ async function ifNotExistCreateDir(url, directory) {
     if (condition.includes('cannot find')) {
       return execSync('mkdir ' + path).toString().trim()
     }
-  } finally {
-    //code that executes after try only if there was no catch
   }
 }
 
 function dl(url, directory, a, b, c) {
   window.webContents.send('STATUS_DOWNLOADING');
   ifNotExistCreateDir(url, directory)
+  console.log(directory)
   progress(request(url))
     .on('progress', state => {
       //
@@ -422,9 +422,14 @@ function unzip(directory, url) {
   createReadStream(directory)
   .pipe(unzipper.Extract({ path: path })
   .on('finish', () => {
-    console.log('test')
+    cleanUp(directory)
   })
   )
+}
+
+function cleanUp(a) {
+  window.webContents.send('STATUS_EXTRACTING')
+  return execSync('del /f ' + a).toString().trim()
 }
 
 async function selectDirectory() {
