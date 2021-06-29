@@ -35,6 +35,8 @@ const createWindow = () => {
 };
 
 let a, b, c, browser, gDirectory;
+var file_total;
+var file_count = 1;
 
 app.on('ready', function () {
   createWindow()
@@ -42,6 +44,8 @@ app.on('ready', function () {
 
 ipc.on('START_REQUEST', function () {
   main(a, b, c)
+  file_total = 0
+  file_count = 1
   window.webContents.send('STATUS_FETCHING');
 })
 
@@ -146,9 +150,6 @@ async function scrapeAll(browserInstance, url, brand, a, b, c) {
     print("Could not resolve the browser instance => ", err);
   }
 }
-
-var file_total;
-var file_count = 1;
 
 async function scrapeMSI(page, a, b, c) {
   await page.waitForSelector('.hvr-bob');
@@ -439,7 +440,7 @@ function dl(url, directory, a, b, c) {
 }
 
 function unzip(directory, url) {
-  //window.webContents.send('STATUS_EXTRACTING')
+  window.webContents.send('STATUS_EXTRACTING')
   var name = url.substring(url.lastIndexOf('/') + 1, url.length)
   var path = directory.replace(name, '')
   createReadStream(directory)

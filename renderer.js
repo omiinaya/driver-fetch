@@ -21,6 +21,7 @@ function start() {
     var c = processors.value
     ipc.send('MANUAL_REQUEST', [a, b, c])
     ipc.send("START_REQUEST")
+    pBar.animate(0)
   }
 }
 
@@ -65,7 +66,11 @@ ipc.on('HTML_RESPONSE', (evt, data) => {
 })
 
 ipc.on('PROGRESS_REQUEST', () => {
-  progressBar('progressBar')
+  if (!pBar) {
+    progressBar('progressBar')
+  } else {
+    pBar.animate(0)
+  }
 })
 
 ipc.on('STATUS_FETCHING', () => {
