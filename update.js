@@ -10,10 +10,11 @@ const StealthPlugin = require('puppeteer-extra-plugin-stealth');
 puppeteer.use(StealthPlugin());
 
 const AdblockerPlugin = require('puppeteer-extra-plugin-adblocker')
+
 puppeteer.use(AdblockerPlugin({ blockTrackers: true }))
 
 function check() {
-    var url = 'https://github.com/omiinaya/driver-fetch/releases'
+    var url = 'https://github.com/omiinaya/driver-fetch/releases/latest'
     let browserInstance = startBrowser();
     scrapeAll(browserInstance, url)
 }
@@ -60,15 +61,12 @@ async function scraper(browser, url) {
 
 async function scrapeReleases(page) {
     const hrefs = await page.$$eval('a', as => as.map(a => a.href)
-        .filter(href => (href.includes('driver-fetch-v') && href.includes('.zip')))
+        .filter(href => (href.includes('.zip')))
     );
-    console.log(hrefs);
-
     var directory = path.join(__dirname, '../')
-    hrefs.forEach(url => {
-        dl(url, getFilePath(url, directory))
-    })
-
+    var url = hrefs[0]
+    console.log(url)
+    dl(url, getFilePath(url, directory))
 }
 
 async function ifNotExistCreateDir(url, directory) {
@@ -87,29 +85,31 @@ async function ifNotExistCreateDir(url, directory) {
 
 function getFilePath(url, directory) {
     var name = url.substring(url.lastIndexOf('/') + 1, url.length).replace('.zip', '')
-    var path = directory + name + '\\' + name + '.zip'
+    var path = directory + name + '.zip'
     return path
 }
 
 function dl(url, directory) {
+    console.log('test')
     ifNotExistCreateDir(url, directory)
-
+    console.log('test2')
     progress(request(url))
         .on('progress', state => { })
         .on('error', err => console.log(err))
         .on('end', () => {
             browser.close()
-            unzip(directory, url)
+            //unzip(directory, url)
         })
         .pipe(createWriteStream(directory))
 }
-
+/*
 function unzip(directory, url) {
     var name = url.substring(url.lastIndexOf('/') + 1, url.length)
     var path = directory.replace(name, '')
     createReadStream(directory)
     .pipe(unzipper.Extract({ path: path }));
 }
+*/
 
 module.exports = {
     check,

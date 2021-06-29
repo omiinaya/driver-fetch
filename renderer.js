@@ -89,10 +89,15 @@ ipc.on('UPDATE_BAR', (evt, data) => {
   var b = data.file_total
   animateBar(a, b)
   if (a === b) {
-    var status = document.getElementById('status')
-    status.innerHTML = "<div>Done.</div>"
+    setDone()
   }
 })
+
+function setDone() {
+  var status = document.getElementById('status')
+  status.innerHTML = "<div>Done.</div>"
+  ipc.send("OPEN_DIRECTORY")
+}
 
 function progressBar() {
   var bar = new ProgressBar.Line('#progressBar', {

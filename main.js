@@ -34,7 +34,7 @@ const createWindow = () => {
   window = mainWindow;
 };
 
-let a, b, c, browser;
+let a, b, c, browser, gDirectory;
 
 app.on('ready', function () {
   createWindow()
@@ -57,6 +57,10 @@ ipc.on('DEFAULT_REQUEST', function () {
 ipc.on('MANUAL_REQUEST', function (evt, data) {
   setVars(data[0], data[1], data[2])
   window.webContents.send('HTML_RESPONSE', [data[0], data[1], data[2]]);
+})
+
+ipc.on('OPEN_DIRECTORY', function () {
+  return execSync('start '+ gDirectory + '\\drivers\\').toString()
 })
 
 function setVars(x, y, z) {
@@ -154,6 +158,7 @@ async function scrapeMSI(page, a, b, c) {
   print(hrefs);
   file_total = hrefs.length
   selectDirectory().then((directory) => {
+    gDirectory = directory
     if (directory) {
       console.log("test: " + file_total)
       window.webContents.send('PROGRESS_REQUEST')
@@ -173,6 +178,7 @@ async function scrapeASROCK(page, a, b, c) {
   print(hrefs);
   file_total = hrefs.length
   selectDirectory().then((directory) => {
+    gDirectory = directory
     if (directory) {
       console.log(file_total)
       window.webContents.send('PROGRESS_REQUEST')
@@ -192,6 +198,7 @@ async function scrapeAORUS(page, a, b, c) {
   print(hrefs);
   file_total = hrefs.length
   selectDirectory().then((directory) => {
+    gDirectory = directory
     console.log(file_total)
     window.webContents.send('PROGRESS_REQUEST')
     if (directory) {
@@ -214,6 +221,7 @@ async function scrapeASUS(page, a, b, c) {
   print(hrefs);
   file_total = hrefs.length
   selectDirectory().then((directory) => {
+    gDirectory = directory
     if (directory) {
       console.log(file_total)
       window.webContents.send('PROGRESS_REQUEST')
@@ -431,7 +439,7 @@ function dl(url, directory, a, b, c) {
 }
 
 function unzip(directory, url) {
-  window.webContents.send('STATUS_EXTRACTING')
+  //window.webContents.send('STATUS_EXTRACTING')
   var name = url.substring(url.lastIndexOf('/') + 1, url.length)
   var path = directory.replace(name, '')
   createReadStream(directory)
