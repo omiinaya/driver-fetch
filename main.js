@@ -144,7 +144,7 @@ async function scrapeAll(browserInstance, url, brand, a, b, c) {
 }
 
 var file_total;
-var file_count = 0;
+var file_count = 1;
 
 async function scrapeMSI(page, a, b, c) {
   await page.waitForSelector('.hvr-bob');
@@ -155,8 +155,8 @@ async function scrapeMSI(page, a, b, c) {
   file_total = hrefs.length
   selectDirectory().then((directory) => {
     if (directory) {
-      console.log("test: "+file_total)
-      isDone()
+      console.log("test: " + file_total)
+      window.webContents.send('PROGRESS_REQUEST')
       hrefs.forEach(url => {
         dl(url, getFilePath(url, directory, a, b, c), a, b, c)
       })
@@ -175,7 +175,7 @@ async function scrapeASROCK(page, a, b, c) {
   selectDirectory().then((directory) => {
     if (directory) {
       console.log(file_total)
-      isDone()
+      window.webContents.send('PROGRESS_REQUEST')
       hrefs.forEach(url => {
         dl(url, getFilePath(url, directory, a, b, c), a, b, c)
       })
@@ -193,7 +193,7 @@ async function scrapeAORUS(page, a, b, c) {
   file_total = hrefs.length
   selectDirectory().then((directory) => {
     console.log(file_total)
-      isDone()
+    window.webContents.send('PROGRESS_REQUEST')
     if (directory) {
       hrefs.forEach(url => {
         dl(url, getFilePath(url, directory, a, b, c), a, b, c)
@@ -216,7 +216,7 @@ async function scrapeASUS(page, a, b, c) {
   selectDirectory().then((directory) => {
     if (directory) {
       console.log(file_total)
-      isDone()
+      window.webContents.send('PROGRESS_REQUEST')
       hrefs.forEach(url => {
         dl(url, getFilePath(url, directory, a, b, c), a, b, c)
       })
@@ -435,29 +435,17 @@ function unzip(directory, url) {
   var name = url.substring(url.lastIndexOf('/') + 1, url.length)
   var path = directory.replace(name, '')
   createReadStream(directory)
-  .pipe(unzipper.Extract({ path: path })
-  .on('finish', () => {
-    cleanUp(directory)
-  })
-  )
+    .pipe(unzipper.Extract({ path: path })
+      .on('finish', () => {
+        cleanUp(directory)
+      })
+    )
 }
 
 function cleanUp(a) {
+  window.webContents.send('UPDATE_BAR', { file_count, file_total })
   file_count++
   return execSync('del /f ' + a).toString().trim()
-}
-
-function isDone() {
-  var x = setTimeout(function () {
-    if (file_count === file_total) {
-      window.webContents.send('STATUS_DONE')
-      clearTimeout(x)
-    } else {
-      console.log(file_count)
-      console.log(file_total)
-      isDone()
-    }
-  }, 2000);
 }
 
 async function selectDirectory() {

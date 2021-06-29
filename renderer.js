@@ -1,7 +1,8 @@
 const electron = require('electron')
 const ipc = electron.ipcRenderer
+const ProgressBar = require('progressbar.js')
 
-var motherboard, manufacturers, processors, status
+var motherboard, manufacturers, processors, pBar
 
 //on DOM load
 document.addEventListener("DOMContentLoaded", function (event) {
@@ -63,6 +64,10 @@ ipc.on('HTML_RESPONSE', (evt, data) => {
   setHTML(motherboard, manufacturer, cpu)
 })
 
+ipc.on('PROGRESS_REQUEST', () => {
+  progressBar('progressBar')
+})
+
 ipc.on('STATUS_FETCHING', () => {
   var status = document.getElementById('status')
   status.innerHTML = "<div>Fetching Drivers...</div>"
@@ -73,12 +78,36 @@ ipc.on('STATUS_DOWNLOADING', () => {
   status.innerHTML = "<div>Downloading Drivers...</div>"
 })
 
-ipc.on('STATUS_EXTRACTING', (evt, data) => {
+ipc.on('STATUS_EXTRACTING', () => {
   var status = document.getElementById('status')
   status.innerHTML = "<div>Extracting Drivers...</div>"
 })
 
-ipc.on('STATUS_DONE', (evt, data) => {
-  var status = document.getElementById('status')
-  status.innerHTML = "<div>Done.</div>"
+ipc.on('UPDATE_BAR', (evt, data) => {
+  console.log(data)
+  var a = data.file_count
+  var b = data.file_total
+  animateBar(a, b)
+  if (a === b) {
+    var status = document.getElementById('status')
+    status.innerHTML = "<div>Done.</div>"
+  }
 })
+
+function progressBar() {
+  var bar = new ProgressBar.Line('#progressBar', {
+    strokeWidth: 4,
+    easing: 'easeInOut',
+    duration: 1400,
+    color: '#1b75be',
+    trailColor: '#eee',
+    trailWidth: 1,
+    svgStyle: { width: '100%', height: '100%' }
+  });
+  pBar = bar
+}
+
+function animateBar(a, b) {
+  var x = a / b
+  pBar.animate(x);
+}

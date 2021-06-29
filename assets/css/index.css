@@ -59,3 +59,7 @@ label {
   border-bottom-color: #07d;
   animation: spinner .8s ease infinite;
 }
+
+#progressBar {
+  width: 335px;
+}
