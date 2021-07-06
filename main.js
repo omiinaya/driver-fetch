@@ -8,7 +8,7 @@ const path = require('path')
 const { createWriteStream, createReadStream } = require("fs")
 const request = require('request')
 const progress = require('request-progress')
-const update = require('./update')
+//const update = require('./update')
 const unzipper = require('unzipper')
 
 const StealthPlugin = require('puppeteer-extra-plugin-stealth');
